@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+cd $(dirname $0)/../../
+
+# https://phpmd.org/documentation/index.html
+# Arguments can't be specified in phpmd.xml
+# Format: phpmd [filename|directory] [report format] [ruleset file]
+./vendor/bin/phpmd ${1:-src,tests} ansi tools/qa/phpmd.xml

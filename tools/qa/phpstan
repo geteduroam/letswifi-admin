@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+cd $(dirname $0)/../../
+
+[ -f ./var/cache/dev/App_KernelDevDebugContainer.xml ] || APP_DEBUG=1 ./bin/console cache:warmup
+
+./vendor/bin/phpstan analyse -c tools/qa/phpstan.neon --memory-limit=-1 $1

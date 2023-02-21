@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: app
+    namespace: ibuildings
+spec:
+    replicas: 3
+    strategy:
+        rollingUpdate:
+            maxSurge: 1
+            maxUnavailable: 0
+        type: RollingUpdate
+    template:
+        spec:
+            containers:
+                -   name: www
+                    env:
+                        -   name: SERVER_NAME
+                            value: "http://"
+                -   name: app
+                    env:
+                        -   name: DATABASE_URL
+                            valueFrom:
+                                secretKeyRef:
+                                    name: env-production
+                                    key: db-dsn
+                        -   name: APP_ENV
+                            value: "prod"
+                        -   name: APP_SECRET
+                            valueFrom:
+                                secretKeyRef:
+                                    name: ????-env-production
+                                    key: app-secret
+                        -   name: TRUSTED_PROXIES
+                            value: "REMOTE_ADDR"

@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: svc
+  namespace: ibuildings
+spec:
+  selector:
+      app: ????-app
+  ports:
+    - port: 80

@@ -1,0 +1,33 @@
+version: "3.4"
+
+# Development environment override
+services:
+  app:
+    build:
+      target: symfony_php_debug
+    environment:
+      APP_ENV: dev
+      XDEBUG_MODE: 'debug'
+      PHP_IDE_CONFIG: serverName=symfony
+    extra_hosts:
+      # Ensure that host.docker.internal is correctly defined on Linux
+      - host.docker.internal:host-gateway
+    volumes:
+      - ./:/srv/app
+      # If you develop on Mac or Windows you can remove the vendor/ directory
+      #  from the bind-mount for better performance by enabling the next line:
+      #- /srv/app/vendor
+    ports:
+      # webpack dev-server
+      - "8080:8080"
+
+  caddy:
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./public:/srv/app/public:ro
+
+###> doctrine/doctrine-bundle ###
+  database:
+    ports:
+      - "3306:3306"
+###< doctrine/doctrine-bundle ###

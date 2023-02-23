@@ -1,0 +1,23 @@
+{
+    # Debug
+    {$DEBUG}
+}
+
+{$SERVER_NAME}
+
+log
+
+route {
+    root * /srv/app/public
+    {$BASICAUTH}
+    encode zstd gzip
+    php_fastcgi unix//var/run/php/php-fpm.sock {
+        trusted_proxies private_ranges
+    }
+    @static {
+      file
+      path *.ico *.css *.js *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.jfif
+    }
+    header @static Cache-Control max-age=31536000
+    file_server
+}

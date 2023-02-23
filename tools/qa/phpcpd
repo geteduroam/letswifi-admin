@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+cd $(dirname $0)/../../
+
+# https://github.com/sebastianbergmann/phpcpd
+./vendor/bin/phpcpd \
+    --min-lines=25 \
+    src tests $1

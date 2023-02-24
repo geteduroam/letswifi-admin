@@ -1,67 +1,76 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\RealmSigningLogRepository;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use InvalidArgumentException;
+
+use function in_array;
+use function str_replace;
 
 #[ORM\Entity(repositoryClass: RealmSigningLogRepository::class)]
 class RealmSigningLog
 {
-    const USAGE_CLIENT = 'client';
-    const USAGE_SERVER = 'server';
+    public const USAGE_CLIENT = 'client';
+    public const USAGE_SERVER = 'server';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $serial = null;
+    private int|null $serial = null;
 
     #[ORM\Column(length: 127)]
-    private ?string $realm = null;
+    private string $realm;
 
     #[ORM\Column(length: 255)]
-    private ?string $ca_sub = null;
+    private string $caSub;
 
     #[ORM\Column(length: 255)]
-    private ?string $requester = null;
+    private string $requester;
 
     #[ORM\Column(length: 255)]
-    private ?string $sub = null;
+    private string $sub;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $issued = null;
+    private DateTimeInterface $issued;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $expires = null;
+    private DateTimeInterface $expires;
 
+    /** @var resource */
     #[ORM\Column(type: Types::BLOB)]
     private $csr = null;
 
+    /** @var resource|null */
     #[ORM\Column(type: Types::BLOB, nullable: true)]
     private $x509 = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $revoked = null;
+    private DateTimeInterface|null $revoked = null;
 
     #[ORM\Column(length: 80)]
-    private ?string $usage = null;
+    private string $usage;
 
     #[ORM\Column(length: 127, nullable: true)]
-    private ?string $client = null;
+    private string|null $client = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $user_agent = null;
+    private string $userAgent;
 
     #[ORM\Column(length: 39, nullable: true)]
-    private ?string $ip = null;
+    private string|null $ip = null;
 
-    public function getSerial(): ?int
+    public function getSerial(): int|null
     {
         return $this->serial;
     }
 
-    public function getRealm(): ?string
+    public function getRealm(): string|null
     {
         return $this->realm;
     }
@@ -73,19 +82,19 @@ class RealmSigningLog
         return $this;
     }
 
-    public function getCaSub(): ?string
+    public function getCaSub(): string|null
     {
-        return $this->ca_sub;
+        return $this->caSub;
     }
 
-    public function setCaSub(string $ca_sub): self
+    public function setCaSub(string $caSub): self
     {
-        $this->ca_sub = $ca_sub;
+        $this->caSub = $caSub;
 
         return $this;
     }
 
-    public function getRequester(): ?string
+    public function getRequester(): string|null
     {
         return $this->requester;
     }
@@ -97,7 +106,7 @@ class RealmSigningLog
         return $this;
     }
 
-    public function getSub(): ?string
+    public function getSub(): string|null
     {
         return $this->sub;
     }
@@ -109,35 +118,37 @@ class RealmSigningLog
         return $this;
     }
 
-    public function getIssued(): ?\DateTimeInterface
+    public function getIssued(): DateTimeInterface|null
     {
         return $this->issued;
     }
 
-    public function setIssued(\DateTimeInterface $issued): self
+    public function setIssued(DateTimeInterface $issued): self
     {
         $this->issued = $issued;
 
         return $this;
     }
 
-    public function getExpires(): ?\DateTimeInterface
+    public function getExpires(): DateTimeInterface|null
     {
         return $this->expires;
     }
 
-    public function setExpires(\DateTimeInterface $expires): self
+    public function setExpires(DateTimeInterface $expires): self
     {
         $this->expires = $expires;
 
         return $this;
     }
 
+    /** @return resource */
     public function getCsr()
     {
         return $this->csr;
     }
 
+    /** @param resource $csr */
     public function setCsr($csr): self
     {
         $this->csr = $csr;
@@ -145,11 +156,13 @@ class RealmSigningLog
         return $this;
     }
 
+    /** @return resource|null */
     public function getX509()
     {
         return $this->x509;
     }
 
+    /** @param resource $x509 */
     public function setX509($x509): self
     {
         $this->x509 = $x509;
@@ -157,27 +170,27 @@ class RealmSigningLog
         return $this;
     }
 
-    public function getRevoked(): ?\DateTimeInterface
+    public function getRevoked(): DateTimeInterface|null
     {
         return $this->revoked;
     }
 
-    public function setRevoked(?\DateTimeInterface $revoked): self
+    public function setRevoked(DateTimeInterface|null $revoked): self
     {
         $this->revoked = $revoked;
 
         return $this;
     }
 
-    public function getUsage(): ?string
+    public function getUsage(): string|null
     {
         return $this->usage;
     }
 
     public function setUsage(string $usage): self
     {
-        if (!in_array($usage, array(self::USAGE_CLIENT, self::USAGE_SERVER))) {
-            throw new \InvalidArgumentException("Invalid usage");
+        if (!in_array($usage, [self::USAGE_CLIENT, self::USAGE_SERVER], true)) {
+            throw new InvalidArgumentException('Invalid usage');
         }
 
         $this->usage = $usage;
@@ -185,7 +198,7 @@ class RealmSigningLog
         return $this;
     }
 
-    public function getClient(): ?string
+    public function getClient(): string|null
     {
         return $this->client;
     }
@@ -197,31 +210,31 @@ class RealmSigningLog
         return $this;
     }
 
-    public function getUserAgent(): ?string
+    public function getUserAgent(): string|null
     {
-        return $this->user_agent;
+        return $this->userAgent;
     }
 
-    public function setUserAgent(string $user_agent): self
+    public function setUserAgent(string $userAgent): self
     {
-        $this->user_agent = $user_agent;
+        $this->userAgent = $userAgent;
 
         return $this;
     }
 
-    public function getIp(): ?string
+    public function getIp(): string|null
     {
         return $this->ip;
     }
 
-    public function setIp(?string $ip): self
+    public function setIp(string|null $ip): self
     {
         $this->ip = $ip;
 
         return $this;
     }
 
-    public function getSubjectWithoutCustomerName(): ?string
+    public function getSubjectWithoutCustomerName(): string|null
     {
         return str_replace('CN=', '', $this->sub);
     }

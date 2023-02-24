@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\RealmSigningLog;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<RealmSigningLog>
- *
  * @method RealmSigningLog|null find($id, $lockMode = null, $lockVersion = null)
  * @method RealmSigningLog|null findOneBy(array $criteria, array $orderBy = null)
  * @method RealmSigningLog[]    findAll()
@@ -25,28 +27,34 @@ class RealmSigningLogRepository extends ServiceEntityRepository
     {
         $this->getEntityManager()->persist($entity);
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
+        if (!$flush) {
+            return;
         }
+
+        $this->getEntityManager()->flush();
     }
 
     public function remove(RealmSigningLog $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
+        if (!$flush) {
+            return;
         }
+
+        $this->getEntityManager()->flush();
     }
 
     public function revoke(RealmSigningLog $entity, bool $flush = false): void
     {
         // revoke by setting the expiration date time to 'now'
-        $entity->setRevoked(new \DateTime());
+        $entity->setRevoked(new DateTime());
         $this->getEntityManager()->persist($entity);
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
+        if (!$flush) {
+            return;
         }
+
+        $this->getEntityManager()->flush();
     }
 }

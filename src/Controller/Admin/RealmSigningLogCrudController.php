@@ -1,25 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\RealmSigningLog;
-use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
-use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
-use Symfony\Component\HttpFoundation\Response;
-use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
-use EasyCorp\Bundle\EasyAdminBundle\Exception\EntityRemoveException;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class RealmSigningLogCrudController extends AbstractCrudController
 {
@@ -34,6 +38,10 @@ class RealmSigningLogCrudController extends AbstractCrudController
             ->setPageTitle('index', 'Users');
     }
 
+    /**
+     * @return FieldInterface[]
+     * @psalm-return iterable<FieldInterface>
+     */
     public function configureFields(string $pageName): iterable
     {
         return [
@@ -46,14 +54,14 @@ class RealmSigningLogCrudController extends AbstractCrudController
             TextField::new('client'),
             DateTimeField::new('issued')
                 ->setFormat('yyyy-MM-dd HH:mm:ss')
-                ->formatValue(function ($value, $entity) {
+                ->formatValue(static function ($value, $entity) {
                     return $value ? $value : '-';
                 }),
             DateTimeField::new('revoked')
                 ->setFormat('yyyy-MM-dd HH:mm:ss')
-                ->formatValue(function ($value, $entity) {
+                ->formatValue(static function ($value, $entity) {
                     return $value ? $value : '-';
-                })
+                }),
         ];
     }
 
@@ -77,7 +85,6 @@ class RealmSigningLogCrudController extends AbstractCrudController
             ->linkToCrudAction('revokeRealmSigningLogBatch')
             ->addCssClass('btn btn-primary')
             ->setIcon('fa fa-user-check'));
-
     }
 
     public function configureAssets(Assets $assets): Assets
@@ -94,40 +101,56 @@ class RealmSigningLogCrudController extends AbstractCrudController
             ->add(DateTimeFilter::new('revoked'));
     }
 
-    /*
+    /**
      * LinkToCrudAction to revoke one realm signing log, configured at configureActions
+     *
+     * @throws Exception
      */
-    public function revokeRealmSigningLog(AdminContext $context) : Response
+    public function revokeRealmSigningLog(AdminContext $context): Response
     {
         try {
-            $entity = $context->getEntity()->getInstance();
+            $entity        = $context->getEntity()->getInstance();
             $entityManager = $this->container->get('doctrine')->getManagerForClass(RealmSigningLog::class);
-            $repository = $entityManager->getRepository(RealmSigningLog::class);
-            $repository->revoke($entity, true);
-        } catch (ForeignKeyConstraintViolationException $e) {
-            throw new EntityRemoveException(['entity_name' => $context->getEntity()->getName(), 'message' => $e->getMessage()]);
-        }
+            if ($entityManager !== null) {
+                $repository = $entityManager->getRepository(RealmSigningLog::class);
+                $repository->revoke($entity, true);
+            }
 
-        $url = $context->getReferrer()
-            ?? $this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl();
+            $url = $context->getReferrer()
+                ?? $this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl();
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            throw new Exception($e->getMessage());
+        }
 
         return $this->redirect($url);
     }
 
-    /*
+    /**
      * LinkToCrudAction to revoke multiple (batch) realm signing logs, configured at configureActions
+     *
+     * @throws Exception
      */
-    public function revokeRealmSigningLogBatch(BatchActionDto $batchActionDto)
+    public function revokeRealmSigningLogBatch(BatchActionDto $batchActionDto): Response
     {
-        $className = $batchActionDto->getEntityFqcn();
-        $entityManager = $this->container->get('doctrine')->getManagerForClass($className);
-        foreach ($batchActionDto->getEntityIds() as $id) {
-            $entity = $entityManager->find($className, $id);
-            $repository = $entityManager->getRepository(RealmSigningLog::class);
-            $repository->revoke($entity, true);
-        }
+        try {
+            $entityManager = $this->container->get('doctrine')->getManagerForClass(RealmSigningLog::class);
 
-        $entityManager->flush();
+            if ($entityManager !== null) {
+                foreach ($batchActionDto->getEntityIds() as $id) {
+                    $entity     = $entityManager->find(RealmSigningLog::class, $id);
+                    $repository = $entityManager->getRepository(RealmSigningLog::class);
+                    if ($entity === null) {
+                        continue;
+                    }
+
+                    $repository->revoke($entity, true);
+                }
+
+                $entityManager->flush();
+            }
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            throw new Exception($e->getMessage());
+        }
 
         return $this->redirect($batchActionDto->getReferrerUrl());
     }

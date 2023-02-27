@@ -24,3 +24,30 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+#    App\Security\SamlBundle\Controller\:
+#        resource: '../../Controller'
+#        tags: ['controller.service_arguments']
+    App\Security\LoginFormAuthenticator:
+        arguments:
+            - '@Symfony\Component\Routing\Generator\UrlGeneratorInterface'
+            - '@App\Repository\ContactRepository'
+
+    App\Controller\Security\SamlBundle\SamlController:
+        arguments:
+            - '@logger'
+            - '@surfnet_saml.metadata_factory'
+            - '@surfnet_saml.http.post_binding'
+            - '@surfnet_saml.remote.idp'
+            - '@surfnet_saml.hosted.service_provider'
+        tags:
+            - controller.service_arguments
+        calls:
+            - method: setContainer
+              arguments: [ '@service_container' ]
+
+    # Firewall
+    surfnet_saml.saml_provider:
+        class: App\Security\SamlBundle\Authentication\SamlProvider
+
+    App\Security\SamlBundle\Authentication\SamlProvider:
+        alias: surfnet_saml.saml_provider

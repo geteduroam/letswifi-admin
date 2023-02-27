@@ -5,14 +5,40 @@ security:
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         users_in_memory: { memory: null }
+        app_user_provider:
+            entity:
+                class: App\Entity\Contact
+                property: email
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+#
+#        login_firewall:
+#                pattern: ^/saml/metadata
+#
+#        saml_based:
+#            custom_authenticators:
+#                - Surfnet\SamlBundle\Security\Authentication\SamlAuthenticator
         main:
             lazy: true
             provider: users_in_memory
 
+#            form_login:
+#                # "app_login" is the name of the route created previously
+#                login_path: app_login
+#                check_path: app_login
+#                enable_csrf: true
+            custom_authenticator: App\Security\Authenticator\LoginFormAuthenticator
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
@@ -22,7 +48,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

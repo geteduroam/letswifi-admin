@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of letswifi; a system for easy eduroam device enrollment
+ * Copyright: 2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 namespace App\Entity;
 
 use App\Repository\RealmSigningLogRepository;
@@ -23,9 +29,6 @@ class RealmSigningLog
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private int|null $serial = null;
-
-    #[ORM\Column(length: 127)]
-    private string $realm;
 
     #[ORM\Column(length: 255)]
     private string $caSub;
@@ -65,17 +68,21 @@ class RealmSigningLog
     #[ORM\Column(length: 39, nullable: true)]
     private string|null $ip = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
+    private Realm $realm;
+
     public function getSerial(): int|null
     {
         return $this->serial;
     }
 
-    public function getRealm(): string|null
+    public function getRealm(): Realm
     {
         return $this->realm;
     }
 
-    public function setRealm(string $realm): self
+    public function setRealm(Realm $realm): self
     {
         $this->realm = $realm;
 

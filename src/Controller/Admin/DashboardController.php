@@ -2,8 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of letswifi; a system for easy eduroam device enrollment
+ * Copyright: 2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 namespace App\Controller\Admin;
 
+use _PHPStan_1f608dc6a\Nette\Neon\Exception;
 use App\Entity\RealmSigningLog;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -14,15 +21,32 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractDashboardController
 {
+    /** @throws Exception */
+    #[Route('/', name: 'overview')]
+    public function entrance(): Response
+    {
+        return $this->redirectToRoute('admin_default_locale');
+    }
+
+    /** @throws Exception */
     #[Route('/admin', name: 'admin_default_locale')]
     public function indexDefaultLocale(): Response
     {
+        if (!($this->isGranted('ROLE_SUPER_ADMIN') || $this->isGranted('ROLE_ADMIN'))) {
+            throw new Exception('You have no access to this resource');
+        }
+
         return $this->render('@EasyAdmin/page/content.html.twig');
     }
 
+    /** @throws Exception */
     #[Route('/admin/{_locale}', name: 'admin')]
     public function index(): Response
     {
+        if (!($this->isGranted('ROLE_SUPER_ADMIN') || $this->isGranted('ROLE_ADMIN'))) {
+            throw new Exception('You have no access to this resource');
+        }
+
         return $this->render('@EasyAdmin/page/content.html.twig');
     }
 

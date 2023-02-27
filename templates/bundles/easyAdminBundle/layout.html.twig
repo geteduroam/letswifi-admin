@@ -5,16 +5,16 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-body">
-                    <h4>Do you really want to revoke this realm?</h4>
-                    <p>There is no undo for this operation.</p>
+                    <h4>{{ 'RevokeRealmQuestion'|trans }}</h4>
+                    <p>{{ 'NoUndoOperation'|trans }}</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
-                        <span class="btn-label">{{ 'action.cancel'|trans([], 'EasyAdminBundle') }}</span>
+                        <span class="btn-label">{{ 'Cancel'|trans }}</span>
                     </button>
 
                     <button type="button" data-bs-dismiss="modal" class="btn btn-success" id="modal-confirm-button">
-                        <span class="btn-label">{{ 'action.save'|trans([], 'EasyAdminBundle') }}</span>
+                        <span class="btn-label">{{ 'SaveChanges'|trans }}</span>
                     </button>
                 </div>
             </div>

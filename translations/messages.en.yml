@@ -1,0 +1,11 @@
+RealmSigningLog: Users
+Users: Users
+Dashboard: Dashboard
+Revoke batch: Revoke
+Serial: Id
+Requester: Requester
+Realm: Realm
+Client: Client
+Issued: Issued
+Revoked: Revoked
+Revoke: Revoke

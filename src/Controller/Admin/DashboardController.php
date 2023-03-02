@@ -14,7 +14,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractDashboardController
 {
-    #[Route('/admin', name: 'admin')]
+    #[Route('/admin', name: 'admin_default_locale')]
+    public function indexDefaultLocale(): Response
+    {
+        return $this->render('@EasyAdmin/page/content.html.twig');
+    }
+
+    #[Route('/admin/{_locale}', name: 'admin')]
     public function index(): Response
     {
         return $this->render('@EasyAdmin/page/content.html.twig');
@@ -27,7 +33,8 @@ class DashboardController extends AbstractDashboardController
 
         return Dashboard::new()
             ->setTitle($name)
-            ->setFaviconPath($favicon);
+            ->setFaviconPath($favicon)
+            ->setLocales(['en', 'nl']);
     }
 
     /**

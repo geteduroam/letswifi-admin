@@ -8,7 +8,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace App\Security;
+namespace App\Security\SamlBundle;
 
 use App\Entity\Contact;
 use Symfony\Component\Security\Core\User\UserInterface;

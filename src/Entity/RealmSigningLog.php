@@ -68,6 +68,8 @@ class RealmSigningLog
     #[ORM\Column(length: 39, nullable: true)]
     private string|null $ip = null;
 
+    private string|null $subcount = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
     private Realm $realm;
@@ -243,7 +245,9 @@ class RealmSigningLog
 
     public function getSubjectWithoutCustomerName(): string|null
     {
-        return str_replace('CN=', '', $this->sub);
+        $sub =  str_replace('CN=', '', $this->sub);
+
+        return str_replace('@' . $this->realm->getRealm(), '', $sub);
     }
 
     public function setSubjectWithoutCustomerName(string $sub): self

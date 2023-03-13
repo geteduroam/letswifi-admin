@@ -2,15 +2,16 @@ RealmSigningLog: Users
 Users: Users
 Dashboard: Dashboard
 Revoke batch: Revoke
-Serial: Id
+Serial: Serial
 Requester: Requester
 Realm: Realm
+Realms: Realms
 Client: Client
 Issued: Issued
 Revoked: Revoked
 Revoke: Revoke
 SignInTitle: Login
-EmailAddress: Email Address
+EmailAddress: Email
 Password: Password
 RememberMe: Remember me
 RevokeRealmQuestion: Do you really want to revoke this realm?
@@ -18,3 +19,21 @@ NoUndoOperation: There is no undo for this operation.
 LogInButton: Log in
 SaveChanges: Save changes
 Cancel: Cancel
+LogIn: Log in!
+LoggedInAs: You are logged in as
+Admins: Administrators
+Configuration: Configuration
+Signer: Signer
+SignerDateTime: Signer date
+SignerDays: Signer days
+TrustedCAs: Trusted CAs
+Key: Key
+Refresh key: Refresh key
+vhost: vhost
+OID: OID
+SSID: SSID
+Helpdesk: Helpdesk
+Website: Website
+PhoneNumber: Phone number
+FormDidNotPassValidation: The form did not pass the validation.
+ValidUntil: Valid until

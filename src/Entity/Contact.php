@@ -34,7 +34,7 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     #[ORM\Column]
-    private bool $super;
+    private bool $superAdmin;
 
     /** @var array<string> */
     private array $roles = [];
@@ -89,14 +89,14 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getSuper(): bool
+    public function getSuperAdmin(): bool
     {
-        return $this->super;
+        return $this->superAdmin;
     }
 
-    public function setSuper(bool $super): self
+    public function setSuperAdmin(bool $superAdmin): self
     {
-        $this->super = $super;
+        $this->superAdmin = $superAdmin;
 
         return $this;
     }
@@ -110,7 +110,7 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         if (count($this->roles) === 0) {
-            $this->getSuper() ? $this->roles[] = 'ROLE_SUPER_ADMIN' :  $this->roles[] = 'ROLE_ADMIN';
+            $this->roles[] = $this->getSuperAdmin() ? 'ROLE_SUPER_ADMIN' : $this->roles[] = 'ROLE_ADMIN';
         }
 
         return $this->roles;

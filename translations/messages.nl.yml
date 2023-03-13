@@ -5,6 +5,7 @@ Revoke batch: Intrekken
 Serial: Volgnummer
 Requester: Aanvrager
 Realm: Realm
+Realms: Realms
 Client: Klant
 Issued: Uitgegeven
 Revoked: Ingetrokken
@@ -18,3 +19,21 @@ NoUndoOperation: Deze actie kan niet ongedaan worden gemaakt.
 LogInButton: Login
 SaveChanges: Wijzigingen opslaan
 Cancel: Annuleren
+LogIn: Inloggen!
+LoggedInAs: U bent ingelogd als
+Admins: Administrators
+Configuration: Configuratie
+Signer: Signer
+SignerDay: Dag van ondertekening
+SignerDateTime: Signeertijdstip
+TrustedCAs: Trusted CAs
+Key: Sleutel
+Refresh key: Ververs sleutel
+vhost: vhost
+OID: OID
+SSID: SSID
+Helpdesk: Helpdesk
+Website: Website
+PhoneNumber: Telefoonnr
+FormDidNotPassValidation: Het formulier bevat nog enkele niet ingevulde of niet juist ingevulde velden.
+ValidUntil: Geldig t/m

@@ -10,10 +10,10 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
-use App\Command\RealmCommand;
-use App\Command\RealmSigningLogCommand;
+use App\Controller\Admin\Helper\IndexQueryBuilderHelper;
+use App\Controller\Admin\Helper\RealmHelper;
+use App\Controller\Admin\Helper\RealmSigningLogHelper;
 use App\Entity\Realm;
-use App\Entity\RealmContact;
 use App\Entity\RealmSigningLog;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -30,11 +30,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -45,6 +47,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
         private readonly TokenStorageInterface $tokenStorage,
         private readonly RealmCommand $realmCommand,
         private readonly RealmSigningLogCommand $realmSigningLogCommand,
+        private readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
     ) {
     }
 
@@ -57,7 +60,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
     {
         return $crud
             ->setEntityPermission('ROLE_ADMIN')
-            ->setPageTitle('index', 'Users');
+            ->setPageTitle('index', 'Pseudo accounts');
     }
 
     /**
@@ -67,28 +70,22 @@ class RealmSigningLogCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('serial'),
+            IdField::new('serial', 'Serial'),
             TextField::new('requester'),
-            TextField::new('subjectWithoutCustomerName')
-                ->setLabel('Pseudo account')
-                ->hideOnIndex(),
+            TextField::new('subjectWithoutCustomerName', 'Pseudo account'),
             AssociationField::new('realm')
                 ->formatValue(static function ($value, $entity) {
                     return $entity->getRealm()->getRealm();
                 }),
-            TextField::new('client')
-                ->formatValue(static function ($value, $entity) {
-                    return $value ? $value : '-';
-                }),
-            DateTimeField::new('issued')
+            DateTimeField::new('expires', 'ValidUntil')
                 ->setFormat('yyyy-MM-dd HH:mm:ss')
                 ->formatValue(static function ($value, $entity) {
                     return $value ? $value : '-';
                 }),
-            DateTimeField::new('revoked')
-                ->setFormat('yyyy-MM-dd HH:mm:ss')
+            BooleanField::new('revoked')
+                ->renderAsSwitch(false)
                 ->formatValue(static function ($value, $entity) {
-                    return $value ? $value : '-';
+                    return (bool) $value;
                 }),
         ];
     }
@@ -101,7 +98,10 @@ class RealmSigningLogCrudController extends AbstractCrudController
                 ->setHtmlAttributes([
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#modal-confirm',
-                ]);
+                ])
+                ->displayIf(static function ($entity) {
+                    return !$entity->getRevoked();
+                });
 
         return parent::configureActions($actions)
             ->disable(Action::EDIT)
@@ -128,7 +128,9 @@ class RealmSigningLogCrudController extends AbstractCrudController
         return parent::configureFilters($filters)
             ->add(ChoiceFilter::new('realm')
                 ->setChoices($this->getRealmsChoicesOfUser()))
-            ->add(DateTimeFilter::new('revoked'));
+            ->add(TextFilter::new('requester', 'Requester'))
+            ->add(TextFilter::new('sub', 'Subject'))
+            ->add(DateTimeFilter::new('expires', 'ValidUntil'));
     }
 
     public function createIndexQueryBuilder(
@@ -139,19 +141,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
-            return $queryBuilder;
-        }
-
-        $user = $this->tokenStorage->getToken()->getUser();
-
-        $queryBuilder
-            ->join(Realm::class, 'r', 'WITH', 'entity.realm = r.realm')
-            ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
-            ->andWhere('rc.contact = :id')
-            ->setParameter('id', $user->getId());
-
-        return $queryBuilder;
+        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder);
     }
 
     /**

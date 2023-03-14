@@ -3,7 +3,7 @@ framework:
     trusted_proxies: '%env(TRUSTED_PROXIES)%'
     trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port']
     secret: '%env(APP_SECRET)%'
-    #csrf_protection: true
+    csrf_protection: true
     http_method_override: false
     handle_all_throwables: true
 

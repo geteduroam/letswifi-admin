@@ -2,8 +2,16 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of letswifi; a system for easy eduroam device enrollment
+ * Copyright: 2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 namespace App\Repository;
 
+use App\Entity\Realm;
+use App\Entity\RealmContact;
 use App\Entity\RealmSigningLog;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -56,5 +64,35 @@ class RealmSigningLogRepository extends ServiceEntityRepository
         }
 
         $this->getEntityManager()->flush();
+    }
+
+    public function revokeById(int $id, bool $flush = false): void
+    {
+        $entity = $this->find($id);
+        $this->revoke($entity, $flush);
+    }
+
+    /** @return array<RealmSigningLog> */
+    public function findByUserId(int $id): array|null
+    {
+        return $this->createQueryBuilder('rs')
+            ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
+            ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
+            ->andWhere('rc.contact = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    /** @return array<RealmSigningLog> */
+    public function findByUserIdGroupByRequester(int $id): array|null
+    {
+        return $this->createQueryBuilder('rs')
+            ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
+            ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
+            ->andWhere('rc.contact = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getArrayResult();
     }
 }

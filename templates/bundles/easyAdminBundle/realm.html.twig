@@ -1,0 +1,35 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+{% form_theme form '@EasyAdmin/crud/form_theme.html.twig' %}
+
+{% block configured_javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('refreshKey') }}
+{% endblock %}
+
+{# Let\'s remove/empty the header #}
+{% block content_header_wrapper %} {% endblock content_header_wrapper %}
+
+{# The main page content block #}
+{% block main %}
+    {{ form_start(form) }}
+
+    <div class="content-header page-actions">
+        <h2>{{ 'Realm'|trans }}</h2>
+
+        <div class="form-group">
+            <button class="btn btn-secondary action-save" id="form_cancel" name="form[cancel]" value="cancel" type="submit">{{ 'Cancel'|trans }}</button>
+            <button class="action-saveAndReturn btn btn-primary action-save" id="form_save" name="save" value="save" type="submit">
+                {{ 'SaveChanges'|trans }}</button>
+        </div>
+
+    </div>
+
+    {{ form_widget(form.realm) }}
+
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+    {{ form_rest(form) }}
+{% endblock main %}
+
+{# Let\'s remove/empty the footer #}
+{% block content_footer_wrapper %} {% endblock content_footer_wrapper %}

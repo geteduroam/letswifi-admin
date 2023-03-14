@@ -25,7 +25,7 @@ class RealmSigningLogVoter extends Voter
     protected function supports(string $attribute, mixed $subject): bool
     {
         // if the attribute isn't one we support, return false
-        return $attribute === self::EDIT;
+        return $subject instanceof RealmSigningLog && $attribute === self::EDIT;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -36,17 +36,16 @@ class RealmSigningLogVoter extends Voter
             return false;
         }
 
-        $realmSigningLog = $subject;
-        assert($realmSigningLog instanceof RealmSigningLog);
+        assert($subject instanceof RealmSigningLog);
 
         return match ($attribute) {
-            self::EDIT => $this->canEdit($realmSigningLog, $user),
+            self::EDIT => $this->canEdit($subject, $user),
             default => throw new LogicException('This code should not be reached!')
         };
     }
 
     private function canEdit(RealmSigningLog $realmSigningLog, Contact $user): bool
     {
-        return $user->getSuper() || $user->isOwnerOfRealm($realmSigningLog->getRealm());
+        return $user->getSuperAdmin() || $user->isOwnerOfRealm($realmSigningLog->getRealm());
     }
 }

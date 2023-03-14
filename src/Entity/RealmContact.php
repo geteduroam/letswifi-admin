@@ -30,8 +30,6 @@ class RealmContact
 
     public function __construct()
     {
-        $this->contact = new Contact();
-        $this->realm   = new Realm();
     }
 
     public function getId(): int|null

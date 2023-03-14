@@ -10,8 +10,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
-use App\Command\RealmCommand;
-use App\Command\RealmSigningLogCommand;
+use App\Controller\Admin\Helper\RealmHelper;
+use App\Controller\Admin\Helper\RealmSigningLogHelper;
 use App\Entity\Realm;
 use App\Entity\RealmContact;
 use App\Entity\RealmSigningLog;
@@ -43,8 +43,8 @@ class RealmSigningLogCrudController extends AbstractCrudController
 {
     public function __construct(
         private readonly TokenStorageInterface $tokenStorage,
-        private readonly RealmCommand $realmCommand,
-        private readonly RealmSigningLogCommand $realmSigningLogCommand,
+        private readonly RealmHelper $realmCommand,
+        private readonly RealmSigningLogHelper $realmSigningLogCommand,
     ) {
     }
 

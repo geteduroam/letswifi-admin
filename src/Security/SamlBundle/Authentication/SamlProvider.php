@@ -6,8 +6,8 @@ namespace App\Security\SamlBundle\Authentication;
 
 use App\Entity\Contact;
 use App\Repository\ContactRepository;
-use App\Security\Identity;
 use App\Security\SamlBundle\Exception\MissingSamlAttribute;
+use App\Security\SamlBundle\Identity;
 use BadMethodCallException;
 use Psr\Log\LoggerInterface;
 use SAML2\Assertion;

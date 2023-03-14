@@ -8,13 +8,13 @@ declare(strict_types=1);
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace App\Command;
+namespace App\Controller\Admin\Helper;
 
 use App\Entity\Realm;
 use App\Repository\RealmRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class RealmCommand
+class RealmHelper
 {
     public function __construct(private readonly RealmRepository $realmRepository)
     {

@@ -8,14 +8,14 @@ declare(strict_types=1);
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace App\Command;
+namespace App\Controller\Admin\Helper;
 
 use App\Entity\RealmSigningLog;
 use App\Repository\RealmSigningLogRepository;
 
 use function end;
 
-class RealmSigningLogCommand
+class RealmSigningLogHelper
 {
     public function __construct(private readonly RealmSigningLogRepository $realmSigningLogRepository)
     {

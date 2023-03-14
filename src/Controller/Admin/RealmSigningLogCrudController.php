@@ -45,8 +45,8 @@ class RealmSigningLogCrudController extends AbstractCrudController
 {
     public function __construct(
         private readonly TokenStorageInterface $tokenStorage,
-        private readonly RealmCommand $realmCommand,
-        private readonly RealmSigningLogCommand $realmSigningLogCommand,
+        private readonly RealmHelper $realmCommand,
+        private readonly RealmSigningLogHelper $realmSigningLogCommand,
         private readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
     ) {
     }

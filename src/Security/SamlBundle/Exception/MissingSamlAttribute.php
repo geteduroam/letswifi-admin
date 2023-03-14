@@ -8,12 +8,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace App;
+namespace App\Security\SamlBundle\Exception;
 
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use Surfnet\SamlBundle\Security\Exception\RuntimeException;
 
-class Kernel extends BaseKernel
+class MissingSamlAttribute extends RuntimeException
 {
-    use MicroKernelTrait;
 }

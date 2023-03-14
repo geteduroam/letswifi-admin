@@ -1,0 +1,22 @@
+RealmSigningLog: Users
+Users: Users
+Dashboard: Dashboard
+Revoke batch: Revoke
+Serial: Id
+Requester: Requester
+Realm: Realm
+Client: Client
+Issued: Issued
+Revoked: Revoked
+Revoke: Revoke
+SignInTitle: Login
+EmailAddress: Email Address
+Password: Password
+RememberMe: Remember me
+RevokeRealmQuestion: Do you really want to revoke this realm?
+NoUndoOperation: There is no undo for this operation.
+LogInButton: Log in
+SaveChanges: Save changes
+Cancel: Cancel
+LogIn: Log in!
+LoggedInAs: You are logged in as

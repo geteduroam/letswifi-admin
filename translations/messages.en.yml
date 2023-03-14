@@ -18,3 +18,5 @@ NoUndoOperation: There is no undo for this operation.
 LogInButton: Log in
 SaveChanges: Save changes
 Cancel: Cancel
+LogIn: Log in!
+LoggedInAs: You are logged in as

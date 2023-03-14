@@ -23,8 +23,7 @@ class Realm
     private string|null $realm = null;
 
     /** @var Collection<RealmContact> */
-    #[ORM\OneToMany(mappedBy: 'contact', targetEntity: RealmContact::class)]
-    #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
+    #[ORM\OneToMany(mappedBy: 'realm', targetEntity: RealmContact::class)]
     private Collection $realmContacts;
 
     public function __construct()

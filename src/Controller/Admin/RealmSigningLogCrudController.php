@@ -45,9 +45,9 @@ class RealmSigningLogCrudController extends AbstractCrudController
 {
     public function __construct(
         private readonly TokenStorageInterface $tokenStorage,
-        private readonly RealmHelper $realmCommand,
-        private readonly RealmSigningLogHelper $realmSigningLogCommand,
-        private readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
+        private readonly RealmHelper $realmHelper,
+        private readonly RealmSigningLogHelper $realmSigningLogHelper,
+        protected readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
     ) {
     }
 
@@ -78,7 +78,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
                     return $entity->getRealm()->getRealm();
                 }),
             DateTimeField::new('expires', 'ValidUntil')
-                ->setFormat('yyyy-MM-dd HH:mm:ss')
+                ->setFormat('yyyy-MM-dd')
                 ->formatValue(static function ($value, $entity) {
                     return $value ? $value : '-';
                 }),
@@ -117,7 +117,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
 
     public function configureAssets(Assets $assets): Assets
     {
-        $assets->addJsFile('assets/js/confirm-modal.js');
+        $assets->addJsFile('/assets/js/confirm-modal.js');
 
         return parent::configureAssets($assets);
     }
@@ -152,7 +152,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
         $entity = $context->getEntity()->getInstance();
         $this->denyAccessUnlessGranted('edit', $entity);
 
-        $this->realmSigningLogCommand->revoke($entity);
+        $this->realmSigningLogHelper->revoke($entity);
 
         return $this->redirect($context->getReferrer());
     }
@@ -162,7 +162,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
      */
     public function revokeRealmSigningLogBatch(BatchActionDto $batchActionDto): Response
     {
-        $this->realmSigningLogCommand->revokeBatch($batchActionDto->getEntityIds());
+        $this->realmSigningLogHelper->revokeBatch($batchActionDto->getEntityIds());
 
         return $this->redirect($batchActionDto->getReferrerUrl());
     }
@@ -171,9 +171,9 @@ class RealmSigningLogCrudController extends AbstractCrudController
     public function getRealmsChoicesOfUser(): array
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
-            return $this->realmCommand->getAllRealms();
+            return $this->realmHelper->getAllRealms();
         }
 
-        return $this->realmCommand->getUserRealms($this->tokenStorage->getToken()->getUser());
+        return $this->realmHelper->getUserRealms($this->tokenStorage->getToken()->getUser());
     }
 }

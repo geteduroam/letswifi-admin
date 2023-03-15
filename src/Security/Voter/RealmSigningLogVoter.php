@@ -77,7 +77,7 @@ class RealmSigningLogVoter extends Voter
         return $user->getSuperAdmin() || $user->isOwnerOfRealm($realmSigningLog->getRealm());
     }
 
-    private function canEditRealmSigningUser(RealmSigningLog $realmSigningUser, Contact $user): bool
+    private function canEditRealmSigningUser(RealmSigningUser $realmSigningUser, Contact $user): bool
     {
         return $user->getSuperAdmin() || $user->isOwnerOfRealm($realmSigningUser->getRealm());
     }

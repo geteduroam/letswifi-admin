@@ -13,6 +13,7 @@ namespace App\Security\Voter;
 use App\Entity\Contact;
 use App\Entity\Realm;
 use App\Entity\RealmSigningLog;
+use App\Entity\RealmSigningUser;
 use LogicException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -27,8 +28,9 @@ class RealmSigningLogVoter extends Voter
     protected function supports(string $attribute, mixed $subject): bool
     {
         // if the attribute isn't one we support, return false
-        return
-            ($subject instanceof Realm || $subject instanceof RealmSigningLog)
+        return ($subject instanceof Realm ||
+                $subject instanceof RealmSigningLog ||
+                $subject instanceof RealmSigningUser)
             && $attribute === self::EDIT;
     }
 
@@ -46,12 +48,20 @@ class RealmSigningLogVoter extends Voter
 
         assert(
             $subject instanceof RealmSigningLog ||
+            $subject instanceof RealmSigningUser ||
             $subject instanceof Realm,
         );
 
         if ($subject instanceof RealmSigningLog) {
             return match ($attribute) {
                 self::EDIT => $this->canEdit($subject, $user),
+                default => throw new LogicException('This code should not be reached!')
+            };
+        }
+
+        if ($subject instanceof RealmSigningUser) {
+            return match ($attribute) {
+                self::EDIT => $this->canEditRealmSigningUser($subject, $user),
                 default => throw new LogicException('This code should not be reached!')
             };
         }
@@ -65,6 +75,11 @@ class RealmSigningLogVoter extends Voter
     private function canEdit(RealmSigningLog $realmSigningLog, Contact $user): bool
     {
         return $user->getSuperAdmin() || $user->isOwnerOfRealm($realmSigningLog->getRealm());
+    }
+
+    private function canEditRealmSigningUser(RealmSigningLog $realmSigningUser, Contact $user): bool
+    {
+        return $user->getSuperAdmin() || $user->isOwnerOfRealm($realmSigningUser->getRealm());
     }
 
     private function canEditRealm(Realm $realm, Contact $user): bool

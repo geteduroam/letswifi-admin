@@ -14,7 +14,7 @@ SignInTitle: Login
 EmailAddress: E-mail
 Password: Wachtwoord
 RememberMe: Onthoud mij
-RevokeRealmQuestion: Wilt u deze realm intrekken?
+RevokeQuestion: Wilt u dit account intrekken?
 NoUndoOperation: Deze actie kan niet ongedaan worden gemaakt.
 LogInButton: Login
 SaveChanges: Wijzigingen opslaan
@@ -37,3 +37,10 @@ Website: Website
 PhoneNumber: Telefoonnr
 FormDidNotPassValidation: Het formulier bevat nog enkele niet ingevulde of niet juist ingevulde velden.
 ValidUntil: Geldig t/m
+UserAccounts: Gebruikers
+PseudoAccounts: Pseudo accounts
+Accounts: Accounts
+ValidAccounts: Geldige accounts
+FirstIssued: Eerste aangevraagd
+LastValid: Laaste verlopen
+Expires: Verlopen

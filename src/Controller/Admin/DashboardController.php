@@ -13,6 +13,7 @@ namespace App\Controller\Admin;
 use _PHPStan_1f608dc6a\Nette\Neon\Exception;
 use App\Entity\Contact;
 use App\Entity\Realm;
+use App\Entity\RealmContact;
 use App\Entity\RealmSigningLog;
 use App\Entity\RealmSigningUser;
 use Doctrine\Persistence\ManagerRegistry;
@@ -96,8 +97,14 @@ class DashboardController extends AbstractDashboardController
 
         yield MenuItem::linkToCrud('PseudoAccounts', 'fas fa-users', RealmSigningLog::class);
         yield MenuItem::linkToCrud('UserAccounts', 'fas fa-user-circle', RealmSigningUser::class);
-        yield MenuItem::linkToCrud('Admins', 'fas fa-user-cog', Contact::class)
-            ->setPermission('ROLE_SUPER_ADMIN');
+
+        yield MenuItem::subMenu('Administrator', 'fa fas fa-user')
+            ->setSubItems([
+                MenuItem::linkToCrud('Accounts', 'fas fa-user-cog', Contact::class)
+                    ->setPermission('ROLE_SUPER_ADMIN'),
+                MenuItem::linkToCrud('Realms', 'fas fa-toolbox', RealmContact::class)
+            ->setPermission('ROLE_SUPER_ADMIN'),
+            ]);
     }
 
     private function getRealms(): int

@@ -21,7 +21,7 @@ SaveChanges: Wijzigingen opslaan
 Cancel: Annuleren
 LogIn: Inloggen!
 LoggedInAs: U bent ingelogd als
-Admins: Administrators
+Admins: Administrator accounts
 Configuration: Configuratie
 Signer: Signer
 SignerDay: Dag van ondertekening
@@ -44,3 +44,7 @@ ValidAccounts: Geldige accounts
 FirstIssued: Eerste aangevraagd
 LastValid: Laaste verlopen
 Expires: Verlopen
+AdminRealms: Administrator realms
+RealmContact: Realm
+Administrator: Administrator
+Contact: Administrator

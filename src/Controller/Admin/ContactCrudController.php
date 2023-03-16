@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Entity\Contact;
+use Closure;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -73,7 +74,6 @@ class ContactCrudController extends AbstractCrudController
                 ])
                 ->setRequired($pageName === Crud::PAGE_NEW)
                 ->onlyOnForms()
-
                 ->hideOnIndex(),
         ];
     }
@@ -82,20 +82,26 @@ class ContactCrudController extends AbstractCrudController
     {
         return $actions
             ->disable(Action::SAVE_AND_CONTINUE)
-            ->add(Crud::PAGE_EDIT, Action::INDEX)
-        ;
+            ->add(Crud::PAGE_EDIT, Action::INDEX);
     }
 
-    public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
-    {
+    public function createNewFormBuilder(
+        EntityDto $entityDto,
+        KeyValueStore $formOptions,
+        AdminContext $context,
+    ): FormBuilderInterface {
         $formBuilder = parent::createNewFormBuilder($entityDto, $formOptions, $context);
+
         return $this->addPasswordEventListener($formBuilder);
     }
 
     public function createEditFormBuilder(
-        EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
-    {
+        EntityDto $entityDto,
+        KeyValueStore $formOptions,
+        AdminContext $context,
+    ): FormBuilderInterface {
         $formBuilder = parent::createEditFormBuilder($entityDto, $formOptions, $context);
+
         return $this->addPasswordEventListener($formBuilder);
     }
 
@@ -104,12 +110,14 @@ class ContactCrudController extends AbstractCrudController
         return $formBuilder->addEventListener(FormEvents::POST_SUBMIT, $this->hashPassword());
     }
 
-    private function hashPassword() {
-        return function($event) {
+    private function hashPassword(): Closure
+    {
+        return function ($event): void {
             $form = $event->getForm();
             if (!$form->isValid()) {
                 return;
             }
+
             $password = $form->get('password')->getData();
             if ($password === null) {
                 return;
@@ -119,6 +127,4 @@ class ContactCrudController extends AbstractCrudController
             $form->getData()->setPassword($hash);
         };
     }
-
-
 }

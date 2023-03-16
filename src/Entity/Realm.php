@@ -60,6 +60,11 @@ class Realm
         $this->realmTrusts   = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return $this->getRealm();
+    }
+
     public function getRealm(): string|null
     {
         return $this->realm;

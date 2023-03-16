@@ -41,7 +41,12 @@ class RealmHelper
     {
         $realms = $this->realmRepository->findByUser($user->getId());
 
-        return $this->getRealmsAsStrings($realms);
+        $realmStrings = $this->getRealmsAsStrings($realms);
+
+        if (0 === count($realmStrings)) {
+            $realmStrings['no realms'] = 'no realms';
+        }
+        return $realmStrings;
     }
 
     /** @return array<string> */

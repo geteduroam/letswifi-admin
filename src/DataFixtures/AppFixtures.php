@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\Contact;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -17,10 +18,14 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        /*
-        $product = new Product();
-        $manager->persist($product);
+        $superAdmin = new Contact();
+        $superAdmin->setNameId('super');
+        $superAdmin->setDisplayName('Super');
+        $superAdmin->setEmailAddress('super@super.nl');
+        $superAdmin->setPassword('$2y$13$zQb6nVLleImMZgvrDXyVk.v7Wdwn9IsaA/O.Rceci2ipIAYfrS6M6');
+        $superAdmin->setSuperAdmin(true);
+
+        $manager->persist($superAdmin);
         $manager->flush();
-        */
     }
 }

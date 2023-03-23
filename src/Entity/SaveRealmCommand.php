@@ -10,15 +10,22 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use DateTime;
-
 class SaveRealmCommand
 {
     private string $realm;
 
-    private DateTime $signerDays;
+    private int $signerDays;
 
     private RealmSigner $realmSigner;
+
+    /** @var array<string>  */
+    private array $realmNetworkProfiles;
+
+    /** @var array<string>  */
+    private array $networkProfiles;
+
+    /** @var array<string>  */
+    private array $selectedNetworkProfiles;
 
     private CA $ca;
 
@@ -29,37 +36,25 @@ class SaveRealmCommand
 
     private string $vHost;
 
-    private string $oid;
-
-    private string $ssid;
-
     /** @var array<string> */
     private array $cas;
 
     /** @var array<string>  */
     private array $trustedCas = [];
 
-    private string $emailAddress;
-
-    private string $web;
-
-    private string $phone;
+    private bool $refreshKey;
 
     public function __construct(
         Realm $realm,
     ) {
         $this->setRealm($realm->getRealm())
         ->setRealmSigner($realm->getRealmSigner())
+//        ->setRealmNetworkProfiles($realm->getRealmNetworkProfiles()->toArray())
+        ->setNetworkProfilesByRealmNetworkProfiles($realm->getRealmNetworkProfiles()->toArray())
         ->setSignerDays($realm->getRealmSigner()->getDefaultValidityDays())
         ->setCa($realm->getRealmSigner()?->getSignerCaSub())
         ->setTrusts($realm->getRealmTrusts()->toArray())
-        ->setKey($realm->getRealmKey()->getKeyAsString())
-        ->setVhost($realm->getRealmVhost()->getHttpHost())
-        ->setSsid($realm->getRealmSsid()->getSsid())
-        ->setOid($realm->getRealmOid()->getOid())
-        ->setEmailAddress($realm->getRealmHelpdesk()->getEmailAddress())
-        ->setWeb($realm->getRealmHelpdesk()->getWeb())
-        ->setPhone($realm->getRealmHelpdesk()->getPhone());
+        ->setRefreshKey(false);
     }
 
     public function getRealm(): string|null
@@ -74,12 +69,12 @@ class SaveRealmCommand
         return $this;
     }
 
-    public function getSignerDays(): DateTime
+    public function getSignerDays(): int
     {
         return $this->signerDays;
     }
 
-    public function setSignerDays(DateTime $signerDays): self
+    public function setSignerDays(int $signerDays): self
     {
         $this->signerDays = $signerDays;
 
@@ -94,6 +89,64 @@ class SaveRealmCommand
     public function setRealmSigner(RealmSigner $realmSigner): self
     {
         $this->realmSigner = $realmSigner;
+
+        return $this;
+    }
+
+    /** @return array<string> */
+    public function getNetworkProfiles(): array
+    {
+        return $this->networkProfiles;
+    }
+
+    /** @param array<NetworkProfile> $networkProfiles */
+    public function setNetworkProfiles(array $networkProfiles): self
+    {
+        foreach ($networkProfiles as $networkProfile) {
+            $this->networkProfiles[$networkProfile->getId()] = $networkProfile;
+        }
+
+        return $this;
+    }
+
+    /** @return array<NetworkProfile> */
+    public function getSelectedNetworkProfiles(): array
+    {
+        return $this->selectedNetworkProfiles;
+    }
+
+    /** @param array<RealmNetworkProfile> $networkProfiles */
+    public function setSelectedNetworkProfiles(array $networkProfiles): self
+    {
+        unset($this->selectedNetworkProfiles);
+        foreach ($networkProfiles as $networkProfile) {
+            $this->selectedNetworkProfiles[$networkProfile->getId()] = $networkProfile;
+        }
+
+        return $this;
+    }
+
+    /** @param array<RealmNetworkProfile> $realmNetworkProfiles */
+    public function setNetworkProfilesByRealmNetworkProfiles(array $realmNetworkProfiles): self
+    {
+        unset($this->selectedNetworkProfiles);
+        foreach ($realmNetworkProfiles as $realmNetworkProfile) {
+            $this->selectedNetworkProfiles[$realmNetworkProfile->getNetworkProfile()->getId()] = $realmNetworkProfile->getNetworkProfile();
+        }
+
+        return $this;
+    }
+
+    /** @return array<RealmNetworkProfile> */
+    public function getRealmNetworkProfiles(): array
+    {
+        return $this->realmNetworkProfiles;
+    }
+
+    /** @param array<RealmNetworkProfile> $realmNetworkProfiles */
+    public function setRealmNetworkProfiles(array $realmNetworkProfiles): self
+    {
+        $this->realmNetworkProfiles = $realmNetworkProfiles;
 
         return $this;
     }
@@ -170,74 +223,14 @@ class SaveRealmCommand
         return $this;
     }
 
-    public function getVhost(): string|null
+    public function getRefreshKey(): bool
     {
-        return $this->vHost;
+        return $this->refreshKey;
     }
 
-    public function setVhost(string|null $vHost): self
+    public function setRefreshKey(bool $refreshKey): self
     {
-        $this->vHost = $vHost;
-
-        return $this;
-    }
-
-    public function getOid(): string|null
-    {
-        return $this->oid;
-    }
-
-    public function setOid(string|null $oid): self
-    {
-        $this->oid = $oid;
-
-        return $this;
-    }
-
-    public function getSsid(): string|null
-    {
-        return $this->ssid;
-    }
-
-    public function setSsid(string|null $ssid): self
-    {
-        $this->ssid = $ssid;
-
-        return $this;
-    }
-
-    public function getEmailAddress(): string|null
-    {
-        return $this->emailAddress;
-    }
-
-    public function setEmailAddress(string|null $emailAddress): self
-    {
-        $this->emailAddress = $emailAddress;
-
-        return $this;
-    }
-
-    public function getWeb(): string|null
-    {
-        return $this->web;
-    }
-
-    public function setWeb(string|null $web): self
-    {
-        $this->web = $web;
-
-        return $this;
-    }
-
-    public function getPhone(): string|null
-    {
-        return $this->phone;
-    }
-
-    public function setPhone(string|null $phone): self
-    {
-        $this->phone = $phone;
+        $this->refreshKey = $refreshKey;
 
         return $this;
     }

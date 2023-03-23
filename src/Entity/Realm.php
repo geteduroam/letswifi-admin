@@ -42,22 +42,26 @@ class Realm
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
     private RealmKey|null $realmKey = null;
 
-    #[ORM\OneToOne(mappedBy: 'realm', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
-    private RealmSsid|null $realmSsid = null;
+    /** @var Collection<RealmNetworkProfile>  */
+    #[ORM\OneToMany(mappedBy: 'realm', targetEntity: RealmNetworkProfile::class)]
+    private Collection $realmNetworkProfiles;
 
-    #[ORM\OneToOne(mappedBy: 'realm', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
-    private RealmOid|null $realmOid = null;
+    /** @var Collection<VhostRealm>  */
+    #[ORM\OneToMany(mappedBy: 'realm', targetEntity: VhostRealm::class)]
+    private Collection $vhostRealms;
 
-    #[ORM\OneToOne(mappedBy: 'realm', cascade: ['persist', 'remove'])]
+    /** @var Collection<RealmHelpdesk>  */
+    #[ORM\OneToMany(mappedBy: 'realm', targetEntity: RealmHelpdesk::class)]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
-    private RealmHelpdesk|null $realmHelpdesk = null;
+    private Collection $realmHelpdesks;
 
     public function __construct()
     {
-        $this->realmContacts = new ArrayCollection();
-        $this->realmTrusts   = new ArrayCollection();
+        $this->realmContacts        = new ArrayCollection();
+        $this->realmTrusts          = new ArrayCollection();
+        $this->realmNetworkProfiles = new ArrayCollection();
+        $this->vhostRealms          = new ArrayCollection();
+        $this->realmHelpdesks       = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -162,40 +166,6 @@ class Realm
         return $this;
     }
 
-    public function getRealmSsid(): RealmSsid|null
-    {
-        return $this->realmSsid;
-    }
-
-    public function setRealmSsid(RealmSsid $realmSsid): self
-    {
-        // set the owning side of the relation if necessary
-        if ($realmSsid->getRealm() !== $this) {
-            $realmSsid->setRealm($this);
-        }
-
-        $this->realmSsid = $realmSsid;
-
-        return $this;
-    }
-
-    public function getRealmOid(): RealmOid|null
-    {
-        return $this->realmOid;
-    }
-
-    public function setRealmOid(RealmOid $realmOid): self
-    {
-        // set the owning side of the relation if necessary
-        if ($realmOid->getRealm() !== $this) {
-            $realmOid->setRealm($this);
-        }
-
-        $this->realmOid = $realmOid;
-
-        return $this;
-    }
-
     public function getRealmHelpdesk(): RealmHelpdesk|null
     {
         return $this->realmHelpdesk;
@@ -214,6 +184,85 @@ class Realm
         }
 
         $this->realmHelpdesk = $realmHelpdesk;
+
+        return $this;
+    }
+
+    /** @return Collection<int, RealmNetworkProfile> */
+    public function getRealmNetworkProfiles(): Collection
+    {
+        return $this->realmNetworkProfiles;
+    }
+
+    public function addRealmNetworkProfile(RealmNetworkProfile $realmNetworkProfile): self
+    {
+        if (!$this->realmNetworkProfiles->contains($realmNetworkProfile)) {
+            $this->realmNetworkProfiles->add($realmNetworkProfile);
+            $realmNetworkProfile->setRealm($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRealmNetworkProfile(RealmNetworkProfile $realmNetworkProfile): self
+    {
+        $this->realmNetworkProfiles->removeElement($realmNetworkProfile);
+
+        return $this;
+    }
+
+    /** @return Collection<int, VhostRealm> */
+    public function getVhostRealms(): Collection
+    {
+        return $this->vhostRealms;
+    }
+
+    public function addVhostRealm(VhostRealm $vhostRealm): self
+    {
+        if (!$this->vhostRealms->contains($vhostRealm)) {
+            $this->vhostRealms->add($vhostRealm);
+            $vhostRealm->setRealm($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVhostRealm(VhostRealm $vhostRealm): self
+    {
+        if ($this->vhostRealms->removeElement($vhostRealm)) {
+            // set the owning side to null (unless already changed)
+            if ($vhostRealm->getRealm() === $this) {
+                $vhostRealm->setRealm(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /** @return Collection<int, RealmHelpdesk> */
+    public function getRealmHelpdesks(): Collection
+    {
+        return $this->realmHelpdesks;
+    }
+
+    public function addRealmHelpdesk(RealmHelpdesk $realmHelpdesk): self
+    {
+        if (!$this->realmHelpdesks->contains($realmHelpdesk)) {
+            $this->realmHelpdesks->add($realmHelpdesk);
+            $realmHelpdesk->setRealm($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRealmHelpdesk(RealmHelpdesk $realmHelpdesk): self
+    {
+        if ($this->realmHelpdesks->removeElement($realmHelpdesk)) {
+            // set the owning side to null (unless already changed)
+            if ($realmHelpdesk->getRealm() === $this) {
+                $realmHelpdesk->setRealm(null);
+            }
+        }
 
         return $this;
     }

@@ -41,7 +41,7 @@ class RealmHelper
     /** @return array<string> */
     public function getUserRealms(UserInterface $user): array
     {
-        $realms = $this->realmRepository->findByUser($user->getId());
+        $realms = $this->realmRepository->findByUser($user->getContact()->getId());
 
         $realmStrings = $this->getRealmsAsStrings($realms);
 

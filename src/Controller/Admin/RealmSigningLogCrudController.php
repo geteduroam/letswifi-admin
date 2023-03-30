@@ -60,7 +60,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
     {
         return $crud
             ->setEntityPermission('ROLE_ADMIN')
-            ->setPageTitle('index', 'Pseudo accounts');
+            ->setPageTitle('index', 'PseudoAccounts');
     }
 
     /**
@@ -72,7 +72,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
         return [
             IdField::new('serial', 'Serial'),
             TextField::new('requester'),
-            TextField::new('subjectWithoutCustomerName', 'Pseudo account'),
+            TextField::new('subjectWithoutCustomerName', 'PseudoAccount'),
             AssociationField::new('realm')
                 ->formatValue(static function ($value, $entity) {
                     return $entity->getRealm()->getRealm();

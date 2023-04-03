@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
-use _PHPStan_1f608dc6a\Nette\Neon\Exception;
 use App\Entity\Contact;
 use App\Entity\Realm;
 use App\Entity\RealmSigningLog;
@@ -19,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -43,24 +43,8 @@ class DashboardController extends AbstractDashboardController
     #[Route('/admin', name: 'admin_default_locale')]
     public function indexDefaultLocale(): Response
     {
-        if (!($this->isGranted('ROLE_SUPER_ADMIN') || $this->isGranted('ROLE_ADMIN'))) {
-            throw new Exception('You have no access to this resource');
-        }
-
-        //return $this->render('@EasyAdmin/page/content.html.twig');
-        return $this->render('bundles/easyAdminBundle/dashboard.html.twig', [
-            'realms' => $this->getRealms(),
-            'users' => $this->getUsers(),
-            'pseudoAccounts' => $this->getPseudoAccounts(),
-        ]);
-    }
-
-    /** @throws Exception */
-    #[Route('/admin/{_locale}', name: 'admin')]
-    public function index(): Response
-    {
-        if (!($this->isGranted('ROLE_SUPER_ADMIN') || $this->isGranted('ROLE_ADMIN'))) {
-            throw new Exception('You have no access to this resource');
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException();
         }
 
         //return $this->render('@EasyAdmin/page/content.html.twig');

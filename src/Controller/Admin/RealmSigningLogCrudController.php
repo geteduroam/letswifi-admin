@@ -14,6 +14,7 @@ use App\Controller\Admin\Helper\IndexQueryBuilderHelper;
 use App\Controller\Admin\Helper\RealmHelper;
 use App\Controller\Admin\Helper\RealmSigningLogHelper;
 use App\Entity\Realm;
+use App\Entity\RealmContact;
 use App\Entity\RealmSigningLog;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -39,12 +40,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class RealmSigningLogCrudController extends AbstractCrudController
 {
     public function __construct(
-        private readonly TokenStorageInterface $tokenStorage,
         private readonly RealmHelper $realmCommand,
         private readonly RealmSigningLogHelper $realmSigningLogCommand,
         private readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
@@ -168,12 +167,12 @@ class RealmSigningLogCrudController extends AbstractCrudController
     }
 
     /** @return array<Realm> */
-    public function getRealmsChoicesOfUser(): array
+    private function getRealmsChoicesOfUser(): array
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             return $this->realmCommand->getAllRealms();
         }
 
-        return $this->realmCommand->getUserRealms($this->tokenStorage->getToken()->getUser());
+        return $this->realmCommand->getUserRealms($this->getUser());
     }
 }

@@ -78,7 +78,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
                 }),
             TextField::new('client')
                 ->formatValue(static function ($value, $entity) {
-                    return $value ? $value : '-';
+                    return $value ?? '-';
                 }),
             DateTimeField::new('issued')
                 ->setFormat('yyyy-MM-dd HH:mm:ss')
@@ -143,7 +143,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
             return $queryBuilder;
         }
 
-        $user = $this->tokenStorage->getToken()->getUser();
+        $user = $this->getUser();
 
         $queryBuilder
             ->join(Realm::class, 'r', 'WITH', 'entity.realm = r.realm')
@@ -178,12 +178,12 @@ class RealmSigningLogCrudController extends AbstractCrudController
     }
 
     /** @return array<Realm> */
-    public function getRealmsChoicesOfUser(): array
+    private function getRealmsChoicesOfUser(): array
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             return $this->realmCommand->getAllRealms();
         }
 
-        return $this->realmCommand->getUserRealms($this->tokenStorage->getToken()->getUser());
+        return $this->realmCommand->getUserRealms($this->getUser());
     }
 }

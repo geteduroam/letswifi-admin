@@ -30,7 +30,7 @@ class CA
     private string|null $key = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'cAs')]
-    #[ORM\JoinColumn(name: 'issuer', referencedColumnName: 'sub', nullable: false)]
+    #[ORM\JoinColumn(name: 'issuer', referencedColumnName: 'sub')]
     private self|null $issuer = null;
 
     /** @var Collection<CA>  */

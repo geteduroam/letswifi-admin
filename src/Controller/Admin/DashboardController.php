@@ -28,8 +28,6 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(private readonly ManagerRegistry $doctrine)
     {
-        $connection = $this->doctrine->getConnection();
-        $connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
     }
 
     /** @throws Exception */
@@ -50,7 +48,7 @@ class DashboardController extends AbstractDashboardController
         //return $this->render('@EasyAdmin/page/content.html.twig');
         return $this->render('bundles/easyAdminBundle/dashboard.html.twig', [
             'realms' => $this->getRealms(),
-            'users' => $this->getUsers(),
+            'users' => $this->countUsers(),
             'pseudoAccounts' => $this->getPseudoAccounts(),
         ]);
     }
@@ -90,24 +88,16 @@ class DashboardController extends AbstractDashboardController
 
     private function getRealms(): int
     {
-        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
-            return $this->doctrine->getRepository(Realm::class)->count([]);
-        }
-
-        return count($this->doctrine->getRepository(
+        return $this->doctrine->getRepository(
             Realm::class,
-        )->findByUser($this->getUser()->getId()));
+        )->countRealmsForRole($this->getUser()->getRoles(), $this->getUser()->getId());
     }
 
-    private function getUsers(): int
+    private function countUsers(): int
     {
-        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
-            return $this->doctrine->getRepository(RealmSigningLog::class)->count([]);
-        }
-
-        return count($this->doctrine->getRepository(
+        return $this->doctrine->getRepository(
             RealmSigningLog::class,
-        )->findByUserId($this->getUser()->getId()));
+        )->countRealmSigningLogsForRole($this->getUser()->getRoles(), $this->getUser()->getId());
     }
 
     private function getPseudoAccounts(): int

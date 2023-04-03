@@ -15,6 +15,8 @@ use App\Entity\RealmContact;
 use App\Entity\RealmSigningLog;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -92,7 +94,30 @@ class RealmSigningLogRepository extends ServiceEntityRepository
             ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
             ->andWhere('rc.contact = :id')
             ->setParameter('id', $id)
+            ->groupBy('rs.requester')
             ->getQuery()
             ->getArrayResult();
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function countRealmSigningLogsForRole(array $roles, int $id): int
+    {
+        if (in_array('ROLE_SUPER_ADMIN', $roles)) {
+            return $this->count([]);
+        }
+
+        $queryBuilder = $this->createQueryBuilder('rs');
+
+        return $queryBuilder
+            ->select($queryBuilder->expr()->count('rs'))
+            ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
+            ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
+            ->andWhere('rc.contact = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

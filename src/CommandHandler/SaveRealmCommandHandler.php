@@ -8,11 +8,9 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\CommandHandler;
 
-use App\Entity\Realm;
-use App\Entity\SaveRealmCommand;
-use App\Repository\CARepository;
+use App\Command\SaveRealmCommand;
 use App\Repository\RealmHelpdeskRepository;
 use App\Repository\RealmOidRepository;
 use App\Repository\RealmRepository;
@@ -21,11 +19,10 @@ use App\Repository\RealmSsidRepository;
 use App\Repository\RealmTrustRepository;
 use App\Repository\RealmVhostRepository;
 
-class SaveCommandFactory
+class SaveRealmCommandHandler
 {
     public function __construct(
         private readonly RealmRepository $realmRepository,
-        private readonly CARepository $caRepository,
         private readonly RealmSignerRepository $realmSignerRepository,
         private readonly RealmTrustRepository $realmTrustRepository,
         private readonly RealmVhostRepository $realmVhostRepository,
@@ -35,16 +32,7 @@ class SaveCommandFactory
     ) {
     }
 
-    public function buildRealmCommandByRealm(
-        Realm $realm,
-    ): SaveRealmCommand {
-        $command = new SaveRealmCommand($realm);
-        $command->setCas($this->caRepository->findAll());
-
-        return $command;
-    }
-
-    public function saveRealm(SaveRealmCommand $command): void
+    public function save(SaveRealmCommand $command): void
     {
         $this->saveRealmSigner($command);
         $this->saveRealmTrusts($command);

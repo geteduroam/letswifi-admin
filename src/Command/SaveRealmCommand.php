@@ -8,8 +8,11 @@ declare(strict_types=1);
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace App\Entity;
+namespace App\Command;
 
+use App\Entity\CA;
+use App\Entity\Realm;
+use App\Entity\RealmSigner;
 use DateTime;
 
 class SaveRealmCommand

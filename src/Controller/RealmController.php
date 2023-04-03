@@ -10,7 +10,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\SaveRealmCommand;
+use App\Command\SaveRealmCommand;
+use App\CommandHandler\SaveRealmCommandHandler;
+use App\Factory\SaveRealmCommandFactory;
 use App\Form\Entity\RealmType;
 use App\Repository\RealmRepository;
 use InvalidArgumentException;
@@ -28,8 +30,9 @@ class RealmController extends AbstractController
 {
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
-        private readonly SaveCommandFactory $saveCommandFactory,
+        private readonly SaveRealmCommandFactory $saveRealmCommandFactory,
         private readonly RealmRepository $realmRepository,
+        private readonly SaveRealmCommandHandler $saveRealmCommandHandler
     ) {
     }
 
@@ -46,7 +49,7 @@ class RealmController extends AbstractController
             return $this->redirect($referrer);
         }
 
-        $realmCommand = $this->saveCommandFactory->buildRealmCommandByRealm($entity);
+        $realmCommand = $this->saveRealmCommandFactory->buildRealmCommandByRealm($entity);
 
         $form = $this->formFactory->create(RealmType::class, $realmCommand);
 
@@ -90,7 +93,7 @@ class RealmController extends AbstractController
     private function saveRealm(
         SaveRealmCommand $saveRealmCommand,
     ): void {
-        $this->saveCommandFactory->saveRealm($saveRealmCommand);
+        $this->saveRealmCommandHandler->save($saveRealmCommand);
     }
 
     private function isSaveAction(Request $request): bool

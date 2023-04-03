@@ -13,21 +13,18 @@ namespace App\Controller\Admin\Helper;
 use App\Entity\Realm;
 use App\Entity\RealmContact;
 use Doctrine\ORM\QueryBuilder;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class IndexQueryBuilderHelper extends AbstractCrudController
+class IndexQueryBuilderHelper
 {
-    public function __construct(
-        private readonly TokenStorageInterface $tokenStorage,
-    ) {
+    public function __construct() {
     }
 
     public function buildRealmQuery(
         QueryBuilder $queryBuilder,
+        array $roles,
+        int $userId
     ): QueryBuilder {
-        $user = $this->tokenStorage->getToken()->getUser();
-        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
+        if (in_array('ROLE_SUPER_ADMIN', $roles)) {
             return $queryBuilder;
         }
 
@@ -35,13 +32,8 @@ class IndexQueryBuilderHelper extends AbstractCrudController
             ->join(Realm::class, 'r', 'WITH', 'entity.realm = r.realm')
             ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
             ->andWhere('rc.contact = :id')
-            ->setParameter('id', $user->getId());
+            ->setParameter('id', $userId);
 
         return $queryBuilder;
-    }
-
-    public static function getEntityFqcn(): string
-    {
-        return '';
     }
 }

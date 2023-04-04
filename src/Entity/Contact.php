@@ -40,12 +40,17 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     /** @var Collection<RealmContact> */
-    #[ORM\OneToMany(mappedBy: 'contact', targetEntity: RealmContact::class)]
+    #[ORM\OneToMany(mappedBy: 'contact', targetEntity: RealmContact::class, cascade: ['remove'])]
     private Collection $realmContacts;
 
     public function __construct()
     {
         $this->realmContacts = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getEmailAddress();
     }
 
     public function getId(): int|null

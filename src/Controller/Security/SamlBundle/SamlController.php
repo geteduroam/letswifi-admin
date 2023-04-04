@@ -10,11 +10,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Security\SamlBundle;
 
-use Psr\Log\LoggerInterface;
-use Surfnet\SamlBundle\Entity\IdentityProvider;
-use Surfnet\SamlBundle\Entity\ServiceProvider;
 use Surfnet\SamlBundle\Exception\LogicException;
-use Surfnet\SamlBundle\Http\PostBinding;
 use Surfnet\SamlBundle\Http\XMLResponse;
 use Surfnet\SamlBundle\Metadata\MetadataFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,15 +20,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class SamlController extends AbstractController
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
         private readonly MetadataFactory $metadataFactory,
-        private readonly PostBinding $postBinding,
-        private readonly IdentityProvider $identityProvider,
-        private readonly ServiceProvider $serviceProvider,
     ) {
     }
 
-    #[Route('/saml/acs', name: 'dashboard_saml_consume_assertion', methods: ['POST'])]
+    #[Route('/saml/acs', name: 'letswifi_admin_saml_consume_assertion', methods: ['POST'])]
     public function consumeAssertionAction(Request $request): void
     {
         throw new LogicException(
@@ -40,7 +32,7 @@ class SamlController extends AbstractController
         );
     }
 
-    #[Route('/saml/metadata', name:'dashboard_saml_metadata', methods: ['GET'])]
+    #[Route('/saml/metadata', name: 'letswifi_admin_saml_metadata', methods: ['GET'])]
     public function metadataAction(): XMLResponse
     {
         return new XMLResponse(

@@ -18,11 +18,12 @@ RevokeQuestion: Do you really want to revoke this account?
 NoUndoOperation: There is no undo for this operation.
 LogInButton: Log in
 SaveChanges: Save changes
-Cancel: Cancel
+BackToListing: Back to listing
 LogIn: Log in!
 LoggedInAs: You are logged in as
-Admins: Administrators
+Admins: Administrator accounts
 Configuration: Configuration
+Configurations: Configurations
 Signer: Signer
 SignerDateTime: Signer date
 SignerDays: Signer days
@@ -45,3 +46,16 @@ LastValid: Last valid until
 Expires: Expires
 PseudoAccounts: Pseudo accounts
 PseudoAccount: Pseudo account
+AdminRealms: Administrator realms
+RealmContact: Realm
+Administrator: Administrator
+Contact: Administrator
+NetworkProfile: Network profile
+Type: type
+Name: Name
+Value: Value
+VhostRealm: vHost realm
+HttpHost: Http host
+PathPrefix: Path prefix
+AuthService: Authentication service
+AuthConfiguration: Authentication configuration

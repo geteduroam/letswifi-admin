@@ -10,7 +10,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
+use App\Entity\Contact;
+use App\Entity\Realm;
 use App\Entity\RealmSigningLog;
+use App\Entity\RealmSigningUser;
+use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface;
@@ -19,8 +23,14 @@ use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+use function count;
+
 class DashboardController extends AbstractDashboardController
 {
+    public function __construct(private readonly ManagerRegistry $doctrine)
+    {
+    }
+
     /** @throws Exception */
     #[Route('/', name: 'overview')]
     public function entrance(): Response
@@ -36,7 +46,11 @@ class DashboardController extends AbstractDashboardController
             throw $this->createAccessDeniedException();
         }
 
-        return $this->render('@EasyAdmin/page/content.html.twig');
+        return $this->render('bundles/easyAdminBundle/dashboard.html.twig', [
+            'realms' => $this->getRealms(),
+            'users' => $this->countUsers(),
+            'pseudoAccounts' => $this->getPseudoAccounts(),
+        ]);
     }
 
     public function configureDashboard(): Dashboard
@@ -47,6 +61,7 @@ class DashboardController extends AbstractDashboardController
         return Dashboard::new()
             ->setTitle($name)
             ->setFaviconPath($favicon)
+            ->disableDarkMode()
             ->setLocales(['en', 'nl']);
     }
 
@@ -57,6 +72,33 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-dashboard');
-        yield MenuItem::linkToCrud('Users', 'fas fa-list', RealmSigningLog::class);
+        yield MenuItem::linkToCrud('Configuration', 'fas fa-gear', Realm::class)
+            ->setPermission('ROLE_SUPER_ADMIN');
+
+        yield MenuItem::linkToCrud('PseudoAccounts', 'fas fa-users', RealmSigningLog::class);
+        yield MenuItem::linkToCrud('UserAccounts', 'fas fa-user-circle', RealmSigningUser::class);
+        yield MenuItem::linkToCrud('Admins', 'fas fa-user-cog', Contact::class)
+            ->setPermission('ROLE_SUPER_ADMIN');
+    }
+
+    private function getRealms(): int
+    {
+        return $this->doctrine->getRepository(
+            Realm::class,
+        )->countRealmsForRole($this->getUser()->getRoles(), $this->getUser()->getId());
+    }
+
+    private function countUsers(): int
+    {
+        return $this->doctrine->getRepository(
+            RealmSigningLog::class,
+        )->countRealmSigningLogsForRole($this->getUser()->getRoles(), $this->getUser()->getId());
+    }
+
+    private function getPseudoAccounts(): int
+    {
+        return count($this->doctrine->getRepository(
+            RealmSigningLog::class,
+        )->findByUserIdGroupByRequester($this->getUser()->getId()));
     }
 }

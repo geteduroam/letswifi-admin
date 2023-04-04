@@ -12,9 +12,9 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Helper\IndexQueryBuilderHelper;
 use App\Controller\Admin\Helper\RealmHelper;
-use App\Controller\Admin\Helper\RealmSigningLogHelper;
+use App\Controller\Admin\Helper\RealmSigningUserHelper;
 use App\Entity\Realm;
-use App\Entity\RealmSigningLog;
+use App\Entity\RealmSigningUser;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
@@ -26,98 +26,41 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\NumericFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
-use Exception;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class RealmSigningLogCrudController extends AbstractCrudController
+class RealmSigningUserCrudController extends AbstractCrudController
 {
     public function __construct(
+        private readonly TokenStorageInterface $tokenStorage,
         private readonly RealmHelper $realmHelper,
-        private readonly RealmSigningLogHelper $realmSigningLogHelper,
-        private readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
+        private readonly RealmSigningUserHelper $realmSigningUserHelper,
+        protected readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
     ) {
     }
 
     public static function getEntityFqcn(): string
     {
-        return RealmSigningLog::class;
+        return RealmSigningUser::class;
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
+            ->setPaginatorUseOutputWalkers(true)
+            ->setPaginatorFetchJoinCollection(true)
             ->setEntityPermission('ROLE_ADMIN')
-            ->setPageTitle('index', 'PseudoAccounts');
-    }
-
-    /**
-     * @return FieldInterface[]
-     * @psalm-return iterable<FieldInterface>
-     */
-    public function configureFields(string $pageName): iterable
-    {
-        return [
-            IdField::new('serial', 'Serial'),
-            TextField::new('requester'),
-            TextField::new('subjectWithoutCustomerName', 'PseudoAccount'),
-            AssociationField::new('realm')
-                ->formatValue(static function ($value, $entity) {
-                    return $entity->getRealm()->getRealm();
-                }),
-            DateTimeField::new('expires', 'ValidUntil')
-                ->setFormat('yyyy-MM-dd')
-                ->formatValue(static function ($value, $entity) {
-                    return $value ?? '-';
-                }),
-            BooleanField::new('revoked')
-                ->renderAsSwitch(false)
-                ->formatValue(static function ($value, $entity) {
-                    return (bool) $value;
-                }),
-        ];
-    }
-
-    public function configureActions(Actions $actions): Actions
-    {
-        $revoke = Action::new('revoke', 'Revoke')
-                ->linkToCrudAction('revokeRealmSigningLog')
-                ->addCssClass('confirm-action')
-                ->setHtmlAttributes([
-                    'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#modal-confirm',
-                ])
-                ->displayIf(static function ($entity) {
-                    return !$entity->getRevoked();
-                });
-
-        return parent::configureActions($actions)
-            ->disable(Action::EDIT)
-            ->disable(Action::NEW)
-            ->disable(Action::DELETE)
-            ->add(Crud::PAGE_INDEX, $revoke)
-            ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->addBatchAction(Action::new('revoke batch', 'Revoke batch')
-            ->linkToCrudAction('revokeRealmSigningLogBatch')
-            ->addCssClass('btn btn-primary')
-            ->setIcon('fa fa-user-check'));
-    }
-
-    public function configureAssets(Assets $assets): Assets
-    {
-        $assets->addJsFile('/assets/js/confirm-modal.js');
-
-        return parent::configureAssets($assets);
+            ->setPageTitle('index', 'User views');
     }
 
     /** @throws Exception */
@@ -127,8 +70,60 @@ class RealmSigningLogCrudController extends AbstractCrudController
             ->add(ChoiceFilter::new('realm')
                 ->setChoices($this->getRealmsChoicesOfUser()))
             ->add(TextFilter::new('requester', 'Requester'))
-            ->add(TextFilter::new('sub', 'Subject'))
-            ->add(DateTimeFilter::new('expires', 'ValidUntil'));
+            ->add(NumericFilter::new('accounts', 'Accounts'))
+            ->add(DateTimeFilter::new('firstIssued', 'FirstIssued'))
+            ->add(DateTimeFilter::new('lastValid', 'LastValid'));
+    }
+
+    /**
+     * @return FieldInterface[]
+     * @psalm-return iterable<FieldInterface>
+     */
+    public function configureFields(string $pageName): iterable
+    {
+        return [
+            TextField::new('requester'),
+            AssociationField::new('realm')
+                ->formatValue(static function ($value, $entity) {
+                    return $entity->getRealm()->getRealm();
+                }),
+            NumberField::new('accounts', 'Accounts'),
+            NumberField::new('openAccounts', 'ValidAccounts'),
+            DateTimeField::new('firstIssued', 'FirstIssued')
+                ->setFormat('yyyy-MM-dd'),
+            DateTimeField::new('lastValid', 'LastValid')
+                ->setFormat('yyyy-MM-dd'),
+        ];
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $revoke = Action::new('revoke', 'Revoke')
+            ->linkToCrudAction('revokeRealmSigningUser')
+            ->addCssClass('confirm-action')
+            ->setHtmlAttributes([
+                'data-bs-toggle' => 'modal',
+                'data-bs-target' => '#modal-confirm',
+            ])
+            ->displayIf(static function ($entity) {
+                return $entity->getAccounts() !== $entity->getClosedAccounts();
+            });
+
+        return parent::configureActions($actions)
+            ->remove(Crud::PAGE_INDEX, Action::DELETE)
+            ->disable(Action::EDIT)
+            ->disable(Action::NEW)
+            ->disable(Action::DELETE)
+            ->disable(Action::DETAIL)
+            ->add(Crud::PAGE_INDEX, $revoke)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+    }
+
+    public function configureAssets(Assets $assets): Assets
+    {
+        $assets->addJsFile('/assets/js/confirm-modal.js');
+
+        return parent::configureAssets($assets);
     }
 
     public function createIndexQueryBuilder(
@@ -138,39 +133,30 @@ class RealmSigningLogCrudController extends AbstractCrudController
         FilterCollection $filters,
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
-        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder, $this->getUser()->getRoles(), $this->getUser()->getId());
+
+        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder);
     }
 
     /**
      * LinkToCrudAction to revoke one realm signing log, configured at configureAction
      */
-    public function revokeRealmSigningLog(AdminContext $context): Response
+    public function revokeRealmSigningUser(AdminContext $context): Response
     {
         $entity = $context->getEntity()->getInstance();
         $this->denyAccessUnlessGranted('edit', $entity);
 
-        $this->realmSigningLogHelper->revoke($entity);
+        $this->realmSigningUserHelper->revoke($entity);
 
         return $this->redirect($context->getReferrer());
     }
 
-    /**
-     * LinkToCrudAction to revoke multiple (batch) realm signing logs, configured at configureActions
-     */
-    public function revokeRealmSigningLogBatch(BatchActionDto $batchActionDto): Response
-    {
-        $this->realmSigningLogHelper->revokeBatch($batchActionDto->getEntityIds());
-
-        return $this->redirect($batchActionDto->getReferrerUrl());
-    }
-
     /** @return array<Realm> */
-    private function getRealmsChoicesOfUser(): array
+    public function getRealmsChoicesOfUser(): array
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             return $this->realmHelper->getAllRealms();
         }
 
-        return $this->realmHelper->getUserRealms($this->getUser());
+        return $this->realmHelper->getUserRealms($this->tokenStorage->getToken()->getUser());
     }
 }

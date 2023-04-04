@@ -13,6 +13,9 @@ namespace App\Repository;
 use App\Entity\Realm;
 use App\Entity\RealmContact;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -60,5 +63,26 @@ class RealmRepository extends ServiceEntityRepository
             ->setParameter('id', $id)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function countRealmsForRole(array $roles, int $id): int
+    {
+        if (in_array('ROLE_SUPER_ADMIN', $roles)) {
+            return $this->count([]);
+        }
+
+        $queryBuilder = $this->createQueryBuilder('r');
+
+        return $queryBuilder
+            ->select($queryBuilder->expr()->count('r'))
+            ->innerJoin(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
+            ->andWhere('rc.contact = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

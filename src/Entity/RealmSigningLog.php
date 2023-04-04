@@ -243,7 +243,9 @@ class RealmSigningLog
 
     public function getSubjectWithoutCustomerName(): string|null
     {
-        return str_replace('CN=', '', $this->sub);
+        $sub =  str_replace('CN=', '', $this->sub);
+
+        return str_replace('@' . $this->realm->getRealm(), '', $sub);
     }
 
     public function setSubjectWithoutCustomerName(string $sub): self

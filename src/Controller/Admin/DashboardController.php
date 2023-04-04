@@ -45,7 +45,6 @@ class DashboardController extends AbstractDashboardController
             throw $this->createAccessDeniedException();
         }
 
-        //return $this->render('@EasyAdmin/page/content.html.twig');
         return $this->render('bundles/easyAdminBundle/dashboard.html.twig', [
             'realms' => $this->getRealms(),
             'users' => $this->countUsers(),

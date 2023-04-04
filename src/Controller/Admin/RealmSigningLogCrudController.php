@@ -77,9 +77,14 @@ class RealmSigningLogCrudController extends AbstractCrudController
                     return $entity->getRealm()->getRealm();
                 }),
             DateTimeField::new('expires', 'ValidUntil')
+            TextField::new('client')
+                ->formatValue(static function ($value, $entity) {
+                    return $value ?? '-';
+                }),
+            DateTimeField::new('issued')
                 ->setFormat('yyyy-MM-dd HH:mm:ss')
                 ->formatValue(static function ($value, $entity) {
-                    return $value ? $value : '-';
+                    return $value ?? : '-';
                 }),
             BooleanField::new('revoked')
                 ->renderAsSwitch(false)
@@ -139,7 +144,6 @@ class RealmSigningLogCrudController extends AbstractCrudController
         FilterCollection $filters,
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
-
         return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder, $this->getUser()->getRoles(), $this->getUser()->getId());
     }
 

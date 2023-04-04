@@ -68,8 +68,6 @@ class RealmSigningLog
     #[ORM\Column(length: 39, nullable: true)]
     private string|null $ip = null;
 
-    private string|null $subcount = null;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
     private Realm $realm;

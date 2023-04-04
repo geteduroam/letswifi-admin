@@ -13,6 +13,7 @@ namespace App\Controller\Admin;
 use App\Entity\Contact;
 use App\Entity\Realm;
 use App\Entity\RealmSigningLog;
+use App\Entity\RealmSigningUser;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -71,18 +72,13 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-dashboard');
+        yield MenuItem::linkToCrud('Configuration', 'fas fa-gear', Realm::class)
+            ->setPermission('ROLE_SUPER_ADMIN');
 
-        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
-            yield MenuItem::linkToCrud('Configuration', 'fas fa-gear', Realm::class);
-        }
-
-        yield MenuItem::linkToCrud('Pseudo accounts', 'fas fa-users', RealmSigningLog::class);
-
-        if (!$this->isGranted('ROLE_SUPER_ADMIN')) {
-            return;
-        }
-
-        yield MenuItem::linkToCrud('Admins', 'fas fa-user', Contact::class);
+        yield MenuItem::linkToCrud('PseudoAccounts', 'fas fa-users', RealmSigningLog::class);
+        yield MenuItem::linkToCrud('UserAccounts', 'fas fa-user-circle', RealmSigningUser::class);
+        yield MenuItem::linkToCrud('Admins', 'fas fa-user-cog', Contact::class)
+            ->setPermission('ROLE_SUPER_ADMIN');
     }
 
     private function getRealms(): int

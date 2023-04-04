@@ -57,6 +57,11 @@ class RealmSigningLogRepository extends ServiceEntityRepository
 
     public function revoke(RealmSigningLog $entity, bool $flush = false): void
     {
+        // Do not revoke again!
+        if ($entity->getRevoked()) {
+            return;
+        }
+
         // revoke by setting the expiration date time to 'now'
         $entity->setRevoked(new DateTime());
         $this->getEntityManager()->persist($entity);
@@ -74,7 +79,7 @@ class RealmSigningLogRepository extends ServiceEntityRepository
         $this->revoke($entity, $flush);
     }
 
-    /** @return array<RealmSigningLog> */
+    /** @return array<RealmSigningLog>|null */
     public function findByUserId(int $id): array|null
     {
         return $this->createQueryBuilder('rs')
@@ -86,7 +91,7 @@ class RealmSigningLogRepository extends ServiceEntityRepository
             ->getArrayResult();
     }
 
-    /** @return array<RealmSigningLog> */
+    /** @return array<RealmSigningLog>|null */
     public function findByUserIdGroupByRequester(int $id): array|null
     {
         return $this->createQueryBuilder('rs')
@@ -119,5 +124,17 @@ class RealmSigningLogRepository extends ServiceEntityRepository
             ->setParameter('id', $id)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /** @return array<RealmSigningLog>|null */
+    public function findByRequesterAndRealm(string $requester, string $realm): array|null
+    {
+        return $this->createQueryBuilder('rs')
+            ->andWhere('rs.requester = :requester')
+            ->andWhere('rs.realm = :realm')
+            ->setParameter('requester', $requester)
+            ->setParameter('realm', $realm)
+            ->getQuery()
+            ->getResult();
     }
 }

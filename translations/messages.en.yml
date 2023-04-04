@@ -14,7 +14,7 @@ SignInTitle: Login
 EmailAddress: Email
 Password: Password
 RememberMe: Remember me
-RevokeRealmQuestion: Do you really want to revoke this realm?
+RevokeQuestion: Do you really want to revoke this account?
 NoUndoOperation: There is no undo for this operation.
 LogInButton: Log in
 SaveChanges: Save changes
@@ -37,5 +37,11 @@ Website: Website
 PhoneNumber: Phone number
 FormDidNotPassValidation: The form did not pass the validation.
 ValidUntil: Valid until
+UserAccounts: User accounts
+Accounts: Accounts
+ValidAccounts: Valid accounts
+FirstIssued: First issued
+LastValid: Last valid until
+Expires: Expires
 PseudoAccounts: Pseudo accounts
 PseudoAccount: Pseudo account

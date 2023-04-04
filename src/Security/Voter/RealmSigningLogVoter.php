@@ -14,6 +14,7 @@ use App\Entity\Contact;
 use App\Entity\Realm;
 use App\Entity\RealmSigningLog;
 use App\Entity\RealmSigningUser;
+use App\Security\SamlBundle\Identity;
 use LogicException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -38,7 +39,7 @@ class RealmSigningLogVoter extends Voter
     {
         $user = $token->getUser();
 
-        if (!$user instanceof Contact) {
+        if (!$user instanceof Identity) {
             return false;
         }
 
@@ -72,18 +73,18 @@ class RealmSigningLogVoter extends Voter
         };
     }
 
-    private function canEdit(RealmSigningLog $realmSigningLog, Contact $user): bool
+    private function canEdit(RealmSigningLog $realmSigningLog, Identity $user): bool
     {
-        return $user->getSuperAdmin() || $user->isOwnerOfRealm($realmSigningLog->getRealm());
+        return $user->getContact()->getSuperAdmin() || $user->getContact()->isOwnerOfRealm($realmSigningLog->getRealm());
     }
 
-    private function canEditRealmSigningUser(RealmSigningUser $realmSigningUser, Contact $user): bool
+    private function canEditRealmSigningUser(RealmSigningUser $realmSigningUser, Identity $user): bool
     {
-        return $user->getSuperAdmin() || $user->isOwnerOfRealm($realmSigningUser->getRealm());
+        return $user->getContact()->getSuperAdmin() || $user->getContact()->isOwnerOfRealm($realmSigningUser->getRealm());
     }
 
-    private function canEditRealm(Realm $realm, Contact $user): bool
+    private function canEditRealm(Realm $realm, Identity $user): bool
     {
-        return $user->getSuperAdmin() || $user->isOwnerOfRealm($realm);
+        return $user->getContact()->getSuperAdmin() || $user->getContact()->isOwnerOfRealm($realm);
     }
 }

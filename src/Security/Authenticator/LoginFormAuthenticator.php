@@ -10,8 +10,8 @@ declare(strict_types=1);
 
 namespace App\Security\Authenticator;
 
-use App\Entity\Contact;
 use App\Repository\ContactRepository;
+use App\Security\SamlBundle\Identity;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,14 +43,12 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
         return new Passport(
             new UserBadge($email, function ($userIdentifier) {
-                $user = new Contact();
-                $user->setEmailAddress($userIdentifier);
                 $user = $this->contactRepository->findOneBy(['emailAddress' => $userIdentifier]);
                 if (!$user) {
                     throw new UserNotFoundException();
                 }
 
-                return $user;
+                return new Identity($user);
             }),
             new PasswordCredentials($request->request->get('password', $password)),
         );

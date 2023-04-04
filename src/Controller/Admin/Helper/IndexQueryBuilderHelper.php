@@ -35,7 +35,7 @@ class IndexQueryBuilderHelper extends AbstractCrudController
             ->join(Realm::class, 'r', 'WITH', 'entity.realm = r.realm')
             ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
             ->andWhere('rc.contact = :id')
-            ->setParameter('id', $user->getId());
+            ->setParameter('id', $user->getContact()->getId());
 
         return $queryBuilder;
     }

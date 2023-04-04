@@ -25,6 +25,8 @@ services:
     volumes:
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./public:/srv/app/public:ro
+    environment:
+      SERVER_NAME: 'ibuildings.localhost'
 
 ###> doctrine/doctrine-bundle ###
   database:

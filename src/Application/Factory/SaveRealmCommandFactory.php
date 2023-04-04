@@ -8,9 +8,9 @@
 
 declare(strict_types=1);
 
-namespace App\Factory;
+namespace App\Application\Factory;
 
-use App\Command\SaveRealmCommand;
+use App\Application\Command\SaveRealmCommand;
 use App\Entity\Realm;
 use App\Repository\CARepository;
 

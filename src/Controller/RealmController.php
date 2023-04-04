@@ -10,9 +10,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Command\SaveRealmCommand;
-use App\CommandHandler\SaveRealmCommandHandler;
-use App\Factory\SaveRealmCommandFactory;
+use App\Application\Command\SaveRealmCommand;
+use App\Application\CommandHandler\SaveRealmCommandHandler;
+use App\Application\Factory\SaveRealmCommandFactory;
 use App\Form\Entity\RealmType;
 use App\Repository\RealmRepository;
 use InvalidArgumentException;

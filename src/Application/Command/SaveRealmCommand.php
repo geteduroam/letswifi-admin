@@ -8,11 +8,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace App\Command;
+namespace App\Application\Command;
 
 use App\Entity\CA;
 use App\Entity\Realm;
-use App\Entity\RealmSigner;
 use DateTime;
 
 class SaveRealmCommand
@@ -20,8 +19,6 @@ class SaveRealmCommand
     private string $realm;
 
     private DateTime $signerDays;
-
-    private RealmSigner $realmSigner;
 
     private CA $ca;
 
@@ -52,7 +49,6 @@ class SaveRealmCommand
         Realm $realm,
     ) {
         $this->setRealm($realm->getRealm())
-        ->setRealmSigner($realm->getRealmSigner())
         ->setSignerDays($realm->getRealmSigner()->getDefaultValidityDays())
         ->setCa($realm->getRealmSigner()?->getSignerCaSub())
         ->setTrusts($realm->getRealmTrusts()->toArray())
@@ -85,18 +81,6 @@ class SaveRealmCommand
     public function setSignerDays(DateTime $signerDays): self
     {
         $this->signerDays = $signerDays;
-
-        return $this;
-    }
-
-    public function getRealmSigner(): RealmSigner
-    {
-        return $this->realmSigner;
-    }
-
-    public function setRealmSigner(RealmSigner $realmSigner): self
-    {
-        $this->realmSigner = $realmSigner;
 
         return $this;
     }

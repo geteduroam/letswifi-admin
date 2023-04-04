@@ -8,9 +8,9 @@
 
 declare(strict_types=1);
 
-namespace App\CommandHandler;
+namespace App\Application\CommandHandler;
 
-use App\Command\SaveRealmCommand;
+use App\Application\Command\SaveRealmCommand;
 use App\Repository\RealmHelpdeskRepository;
 use App\Repository\RealmOidRepository;
 use App\Repository\RealmRepository;
@@ -44,10 +44,12 @@ class SaveRealmCommandHandler
 
     private function saveRealmSigner(SaveRealmCommand $command): void
     {
-        $command->getRealmSigner()->setSignerCaSub($command->getCa());
-        $command->getRealmSigner()->setDefaultValidityDays($command->getSignerDays());
+        $realmSigner = $this->realmSignerRepository->find($command->getRealm());
 
-        $this->realmSignerRepository->save($command->getRealmSigner(), true);
+        $realmSigner->setSignerCaSub($command->getCa());
+        $realmSigner->setDefaultValidityDays($command->getSignerDays());
+
+        $this->realmSignerRepository->save($realmSigner, true);
     }
 
     private function saveRealmTrusts(SaveRealmCommand $command): void

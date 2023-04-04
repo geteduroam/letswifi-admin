@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace App\Form\Entity;
 
-use App\Command\SaveRealmCommand;
+use App\Application\Command\SaveRealmCommand;
 use App\Entity\CA;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;

@@ -10,14 +10,12 @@ declare(strict_types=1);
 
 namespace App\Application\CommandHandler;
 
-use App\Entity\Realm;
-use App\Entity\SaveRealmCommand;
-use App\Repository\RealmOidRepository;
+use App\Application\Command\SaveRealmCommand;
+use App\Repository\RealmKeyRepository;
+use App\Repository\RealmNetworkProfileRepository;
 use App\Repository\RealmRepository;
 use App\Repository\RealmSignerRepository;
-use App\Repository\RealmSsidRepository;
 use App\Repository\RealmTrustRepository;
-use App\Repository\RealmVhostRepository;
 
 class SaveRealmCommandHandler
 {
@@ -25,20 +23,9 @@ class SaveRealmCommandHandler
         private readonly RealmRepository $realmRepository,
         private readonly RealmSignerRepository $realmSignerRepository,
         private readonly RealmTrustRepository $realmTrustRepository,
-        private readonly NetworkProfileRepository $networkProfileRepository,
         private readonly RealmNetworkProfileRepository $realmNetworkProfileRepository,
         private readonly RealmKeyRepository $realmKeyRepository,
     ) {
-    }
-
-    public function buildRealmCommandByRealm(
-        Realm $realm,
-    ): SaveRealmCommand {
-        $command = new SaveRealmCommand($realm);
-        $command->setCas($this->caRepository->findAll());
-        $command->setNetworkProfiles($this->networkProfileRepository->findAll());
-
-        return $command;
     }
 
     public function saveRealm(SaveRealmCommand $command): void

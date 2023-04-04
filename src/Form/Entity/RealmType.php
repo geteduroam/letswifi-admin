@@ -68,7 +68,8 @@ class RealmType extends AbstractType
                     'choices' => $saveRealmCommand->getNetworkProfiles(),
                     'choice_value' => 'id',
                     'choice_label' => static function (NetworkProfile|null $networkProfile) {
-                        return $networkProfile ? $networkProfile->getTypeName() . ' ' . $networkProfile->getName() . ' ' . $networkProfile->getValue() : '';
+                        return $networkProfile ? $networkProfile->getTypeName()
+                            . ' ' . $networkProfile->getName() . ' ' . $networkProfile->getValue() : '';
                     },
                     'required' => true,
                     'multiple' => true,

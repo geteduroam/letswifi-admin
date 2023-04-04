@@ -49,4 +49,9 @@ class Identity implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->getUsername();
     }
+
+    public function getId(): int
+    {
+        return $this->getContact()->getId();
+    }
 }

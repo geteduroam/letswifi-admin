@@ -11,8 +11,10 @@ declare(strict_types=1);
 namespace App\Application\Command;
 
 use App\Entity\CA;
+use App\Entity\NetworkProfile;
 use App\Entity\Realm;
-use DateTime;
+use App\Entity\RealmNetworkProfile;
+use App\Entity\RealmTrust;
 
 class SaveRealmCommand
 {
@@ -20,15 +22,21 @@ class SaveRealmCommand
 
     private int $signerDays;
 
+    /** @var array<string>  */
+    private array $realmNetworkProfiles;
+
+    /** @var array<string>  */
+    private array $networkProfiles = [];
+
+    /** @var array<string>  */
+    private array $selectedNetworkProfiles;
+
     private CA $ca;
 
     /** @var array<RealmTrust>  */
     private array $trusts;
 
     private string $key;
-
-    private string $vHost;
-
     /** @var array<string> */
     private array $cas;
 
@@ -41,9 +49,9 @@ class SaveRealmCommand
         Realm $realm,
     ) {
         $this->setRealm($realm->getRealm())
-        ->setRealmSigner($realm->getRealmSigner())
+        ->setRealmNetworkProfiles($realm->getRealmNetworkProfiles()->toArray())
         ->setNetworkProfilesByRealmNetworkProfiles($realm->getRealmNetworkProfiles()->toArray())
-        ->setSignerDays($realm->getRealmSigner()->getDefaultValidityDays())
+        ->setSignerDays($realm->getRealmSigner()?->getDefaultValidityDays())
         ->setCa($realm->getRealmSigner()?->getSignerCaSub())
         ->setTrusts($realm->getRealmTrusts()->toArray())
         ->setRefreshKey(false);
@@ -111,7 +119,8 @@ class SaveRealmCommand
     {
         unset($this->selectedNetworkProfiles);
         foreach ($realmNetworkProfiles as $realmNetworkProfile) {
-            $this->selectedNetworkProfiles[$realmNetworkProfile->getNetworkProfile()->getId()] = $realmNetworkProfile->getNetworkProfile();
+            $this->selectedNetworkProfiles[$realmNetworkProfile->getNetworkProfile()->getId()] =
+                $realmNetworkProfile->getNetworkProfile();
         }
 
         return $this;

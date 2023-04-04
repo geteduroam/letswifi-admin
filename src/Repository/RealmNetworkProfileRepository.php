@@ -85,7 +85,8 @@ class RealmNetworkProfileRepository extends ServiceEntityRepository
             $realmEntity = new Realm();
             $realmEntity->setRealm($realm);
 
-            $networkProfileEntity = $this->getEntityManager()->getRepository(NetworkProfile::class)->find($networkProfile);
+            $networkProfileEntity = $this->getEntityManager()
+                ->getRepository(NetworkProfile::class)->find($networkProfile);
 
             $entity->setRealm($realmEntity);
             $entity->setNetworkProfile($networkProfileEntity);

@@ -138,7 +138,12 @@ class RealmSigningLogCrudController extends AbstractCrudController
         FilterCollection $filters,
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
-        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder, $this->getUser()->getRoles(), $this->getUser()->getId());
+
+        return $this->indexQueryBuilderHelper->buildRealmQuery(
+            $queryBuilder,
+            $this->getUser()->getRoles(),
+            $this->getUser()->getId(),
+        );
     }
 
     /**

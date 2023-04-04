@@ -13,18 +13,20 @@ namespace App\Controller\Admin\Helper;
 use App\Entity\Realm;
 use App\Entity\RealmContact;
 use Doctrine\ORM\QueryBuilder;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
+use function in_array;
 
 class IndexQueryBuilderHelper
 {
-    public function __construct() {
+    public function __construct()
+    {
     }
 
+    /** @param array<string> $roles */
     public function buildRealmQuery(
         QueryBuilder $queryBuilder,
         array $roles,
-        int $userId
+        int $userId,
     ): QueryBuilder {
         if (in_array('ROLE_SUPER_ADMIN', $roles)) {
             return $queryBuilder;

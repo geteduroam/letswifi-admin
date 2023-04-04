@@ -32,7 +32,7 @@ class RealmController extends AbstractController
         private readonly FormFactoryInterface $formFactory,
         private readonly SaveRealmCommandFactory $saveRealmCommandFactory,
         private readonly RealmRepository $realmRepository,
-        private readonly SaveRealmCommandHandler $saveRealmCommandHandler
+        private readonly SaveRealmCommandHandler $saveRealmCommandHandler,
     ) {
     }
 

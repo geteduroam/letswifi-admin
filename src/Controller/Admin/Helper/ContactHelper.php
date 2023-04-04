@@ -22,7 +22,7 @@ class ContactHelper
     /**
      * @param array<Contact> $contacts
      *
-     * @return array<string>
+     * @return array<string, Contact>
      */
     private function getContactAsStrings(array $contacts): array
     {
@@ -35,7 +35,7 @@ class ContactHelper
         return $choices;
     }
 
-    /** @return array<string> */
+    /** @return array<string, Contact> */
     public function getAllContacts(): array
     {
         $contacts = $this->contactRepository->findAll();

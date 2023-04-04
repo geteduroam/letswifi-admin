@@ -19,6 +19,8 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
+use function in_array;
+
 /**
  * @extends ServiceEntityRepository<RealmSigningLog>
  * @method RealmSigningLog|null find($id, $lockMode = null, $lockVersion = null)
@@ -105,6 +107,8 @@ class RealmSigningLogRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<string> $roles
+     *
      * @throws NonUniqueResultException
      * @throws NoResultException
      */

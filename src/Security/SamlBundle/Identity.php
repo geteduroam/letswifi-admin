@@ -11,9 +11,10 @@ declare(strict_types=1);
 namespace App\Security\SamlBundle;
 
 use App\Entity\Contact;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class Identity implements UserInterface
+class Identity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public function __construct(private readonly Contact $contact)
     {
@@ -27,12 +28,12 @@ class Identity implements UserInterface
     /** @return array|string[] */
     public function getRoles(): array
     {
-        return [];
+        return $this->contact->getRoles();
     }
 
     public function getPassword(): string
     {
-        return '';
+        return $this->contact->getPassword();
     }
 
     public function eraseCredentials(): void

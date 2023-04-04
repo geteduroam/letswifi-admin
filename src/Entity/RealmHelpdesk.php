@@ -2,12 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of letswifi; a system for easy eduroam device enrollment
- * Copyright: 2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
- * SPDX-License-Identifier: BSD-3-Clause
- */
-
 namespace App\Entity;
 
 use App\Repository\RealmHelpdeskRepository;
@@ -17,25 +11,40 @@ use Doctrine\ORM\Mapping as ORM;
 class RealmHelpdesk
 {
     #[ORM\Id]
-    #[ORM\OneToOne(inversedBy: 'realmHelpdesk', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
-    private Realm|null $realm = null;
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int|null $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\ManyToOne(inversedBy: 'realmHelpdesks')]
+    #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
+    private Realm $realm;
+
+    #[ORM\Column(length: 255, nullable: true)]
     private string|null $emailAddress = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private string|null $web = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, nullable: true)]
     private string|null $phone = null;
 
-    public function getRealm(): Realm|null
+    #[ORM\Column(length: 4)]
+    private string|null $lang = null;
+
+    #[ORM\Column(length: 50)]
+    private string|null $name = null;
+
+    public function getId(): int|null
+    {
+        return $this->id;
+    }
+
+    public function getRealm(): Realm
     {
         return $this->realm;
     }
 
-    public function setRealm(Realm|null $realm): self
+    public function setRealm(Realm $realm): self
     {
         $this->realm = $realm;
 
@@ -47,7 +56,7 @@ class RealmHelpdesk
         return $this->emailAddress;
     }
 
-    public function setEmailAddress(string $emailAddress): self
+    public function setEmailAddress(string|null $emailAddress): self
     {
         $this->emailAddress = $emailAddress;
 
@@ -71,9 +80,33 @@ class RealmHelpdesk
         return $this->phone;
     }
 
-    public function setPhone(string $phone): self
+    public function setPhone(string|null $phone): self
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getLang(): string|null
+    {
+        return $this->lang;
+    }
+
+    public function setLang(string $lang): self
+    {
+        $this->lang = $lang;
+
+        return $this;
+    }
+
+    public function getName(): string|null
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }

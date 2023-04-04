@@ -10,8 +10,8 @@ declare(strict_types=1);
 
 namespace App\Application\CommandHandler;
 
-use App\Application\Command\SaveRealmCommand;
-use App\Repository\RealmHelpdeskRepository;
+use App\Entity\Realm;
+use App\Entity\SaveRealmCommand;
 use App\Repository\RealmOidRepository;
 use App\Repository\RealmRepository;
 use App\Repository\RealmSignerRepository;
@@ -25,21 +25,28 @@ class SaveRealmCommandHandler
         private readonly RealmRepository $realmRepository,
         private readonly RealmSignerRepository $realmSignerRepository,
         private readonly RealmTrustRepository $realmTrustRepository,
-        private readonly RealmVhostRepository $realmVhostRepository,
-        private readonly RealmOidRepository $realmOidRepository,
-        private readonly RealmSsidRepository $realmSsidRepository,
-        private readonly RealmHelpdeskRepository $realmHelpdeskRepository,
+        private readonly NetworkProfileRepository $networkProfileRepository,
+        private readonly RealmNetworkProfileRepository $realmNetworkProfileRepository,
+        private readonly RealmKeyRepository $realmKeyRepository,
     ) {
     }
 
-    public function save(SaveRealmCommand $command): void
+    public function buildRealmCommandByRealm(
+        Realm $realm,
+    ): SaveRealmCommand {
+        $command = new SaveRealmCommand($realm);
+        $command->setCas($this->caRepository->findAll());
+        $command->setNetworkProfiles($this->networkProfileRepository->findAll());
+
+        return $command;
+    }
+
+    public function saveRealm(SaveRealmCommand $command): void
     {
         $this->saveRealmSigner($command);
         $this->saveRealmTrusts($command);
-        $this->saveRealmVhost($command);
-        $this->saveRealmOid($command);
-        $this->saveRealmSsid($command);
-        $this->saveRealmHelpdesk($command);
+        $this->saveRealmKey($command);
+        $this->saveRealmNetworkProfile($command);
     }
 
     private function saveRealmSigner(SaveRealmCommand $command): void
@@ -57,41 +64,25 @@ class SaveRealmCommandHandler
         $this->realmTrustRepository->saveTrustsByRealm($command->getRealm(), $command->getTrustedCAs(), true);
     }
 
-    private function saveRealmVhost(SaveRealmCommand $command): void
+    private function saveRealmKey(SaveRealmCommand $command): void
     {
         $realm = $this->realmRepository->findOneBy(['realm' => $command->getRealm()]);
 
-        $realm->getRealmVhost()->setHttpHost($command->getVhost());
+        if (!$command->getRefreshKey()) {
+            return;
+        }
 
-        $this->realmVhostRepository->save($realm->getRealmVhost(), true);
+        $key = $realm->getRealmKey()->generateKey();
+        $realm->getRealmKey()->setKey($key);
+        $this->realmKeyRepository->save($realm->getRealmKey(), true);
     }
 
-    private function saveRealmOid(SaveRealmCommand $command): void
+    private function saveRealmNetworkProfile(SaveRealmCommand $command): void
     {
-        $realm = $this->realmRepository->findOneBy(['realm' => $command->getRealm()]);
-
-        $realm->getRealmOid()->setOid($command->getOid());
-
-        $this->realmOidRepository->save($realm->getRealmOid(), true);
-    }
-
-    private function saveRealmSsid(SaveRealmCommand $command): void
-    {
-        $realm = $this->realmRepository->findOneBy(['realm' => $command->getRealm()]);
-
-        $realm->getRealmSsid()->setSsid($command->getSsid());
-
-        $this->realmSsidRepository->save($realm->getRealmSsid(), true);
-    }
-
-    private function saveRealmHelpdesk(SaveRealmCommand $command): void
-    {
-        $realm = $this->realmRepository->findOneBy(['realm' => $command->getRealm()]);
-
-        $realm->getRealmHelpdesk()->setEmailAddress($command->getEmailAddress());
-        $realm->getRealmHelpdesk()->setWeb($command->getWeb());
-        $realm->getRealmHelpdesk()->setPhone($command->getPhone());
-
-        $this->realmHelpdeskRepository->save($realm->getRealmHelpdesk(), true);
+        $this->realmNetworkProfileRepository->saveByNetworkProfiles(
+            $command->getRealm(),
+            $command->getSelectedNetworkProfiles(),
+            true,
+        );
     }
 }

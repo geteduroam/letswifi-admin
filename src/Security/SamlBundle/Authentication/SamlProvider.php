@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Security\SamlBundle\Authentication;
 
-use App\Entity\Contact;
 use App\Repository\ContactRepository;
 use App\Security\SamlBundle\Exception\MissingSamlAttribute;
 use App\Security\SamlBundle\Identity;
 use BadMethodCallException;
 use Psr\Log\LoggerInterface;
 use SAML2\Assertion;
-use Surfnet\SamlBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\SAML2\Attribute\AttributeDictionary;
 use Surfnet\SamlBundle\SAML2\Response\AssertionAdapter;
 use Surfnet\SamlBundle\Security\Authentication\Provider\SamlProviderInterface;
@@ -50,37 +48,16 @@ class SamlProvider implements SamlProviderInterface, UserProviderInterface
     {
         $translatedAssertion = $this->attributeDictionary->translate($assertion);
 
-        $nameId = $this->getNameId($assertion);
         try {
             $email = $this->getSingleStringValue('mail', $translatedAssertion);
         } catch (MissingSamlAttribute $e) {
             throw new BadCredentialsException($e->getMessage());
         }
 
-        try {
-            $commonName = $this->getSingleStringValue('commonName', $translatedAssertion);
-        } catch (MissingSamlAttribute) {
-            $commonName = '';
-        }
-
-        try {
-            // An exception is thrown when isMemberOf is empty.
-            $teamNames = (array) $translatedAssertion->getAttributeValue('isMemberOf');
-        } catch (RuntimeException) {
-            $teamNames = [];
-        }
-
-        $contact = $this->contacts->findByNameId($nameId);
+        $contact = $this->contacts->findByEmail($email);
 
         if ($contact === null) {
-            $contact = new Contact();
-            $contact->setNameId($nameId)
-                ->setEmailAddress($email)
-                ->setDisplayName($commonName);
-            $contact->assignRole('ROLE_ADMIN');
-        } elseif ($contact->getEmailAddress() !== $email || $contact->getDisplayName() !== $commonName) {
-            $contact->setEmailAddress($email);
-            $contact->setDisplayName($commonName);
+            throw new BadCredentialsException('You have no access');
         }
 
         return new Identity($contact);
@@ -116,7 +93,7 @@ class SamlProvider implements SamlProviderInterface, UserProviderInterface
     {
         $values = $translatedAssertion->getAttributeValue($attribute);
 
-        if (count($values) === 0) {
+        if ($values === null || count($values) === 0) {
             $message = sprintf(
                 'No value(s) found for attribute "%s"',
                 $attribute,

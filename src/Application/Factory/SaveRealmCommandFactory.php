@@ -13,12 +13,13 @@ namespace App\Application\Factory;
 use App\Application\Command\SaveRealmCommand;
 use App\Entity\Realm;
 use App\Repository\CARepository;
+use App\Repository\NetworkProfileRepository;
 
 class SaveRealmCommandFactory
 {
     public function __construct(
         private readonly CARepository $caRepository,
-
+        private readonly NetworkProfileRepository $networkProfileRepository,
     ) {
     }
 
@@ -27,6 +28,7 @@ class SaveRealmCommandFactory
     ): SaveRealmCommand {
         $command = new SaveRealmCommand($realm);
         $command->setCas($this->caRepository->findAll());
+        $command->setNetworkProfiles($this->networkProfileRepository->findAll());
 
         return $command;
     }

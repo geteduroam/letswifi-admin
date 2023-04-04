@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace App\Security\Voter;
 
-use App\Entity\Contact;
 use App\Entity\Realm;
 use App\Entity\RealmSigningLog;
 use App\Entity\RealmSigningUser;
@@ -75,16 +74,19 @@ class RealmSigningLogVoter extends Voter
 
     private function canEdit(RealmSigningLog $realmSigningLog, Identity $user): bool
     {
-        return $user->getContact()->getSuperAdmin() || $user->getContact()->isOwnerOfRealm($realmSigningLog->getRealm());
+        return $user->getContact()->getSuperAdmin() ||
+            $user->getContact()->isOwnerOfRealm($realmSigningLog->getRealm());
     }
 
     private function canEditRealmSigningUser(RealmSigningUser $realmSigningUser, Identity $user): bool
     {
-        return $user->getContact()->getSuperAdmin() || $user->getContact()->isOwnerOfRealm($realmSigningUser->getRealm());
+        return $user->getContact()->getSuperAdmin() ||
+            $user->getContact()->isOwnerOfRealm($realmSigningUser->getRealm());
     }
 
     private function canEditRealm(Realm $realm, Identity $user): bool
     {
-        return $user->getContact()->getSuperAdmin() || $user->getContact()->isOwnerOfRealm($realm);
+        return $user->getContact()->getSuperAdmin() ||
+            $user->getContact()->isOwnerOfRealm($realm);
     }
 }

@@ -134,7 +134,9 @@ class RealmSigningUserCrudController extends AbstractCrudController
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder);
+        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder,
+            $this->getUser()->getRoles(),
+            $this->getUser()->getId());
     }
 
     /**

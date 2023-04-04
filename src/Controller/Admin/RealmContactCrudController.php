@@ -12,7 +12,6 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Helper\ContactHelper;
 use App\Controller\Admin\Helper\RealmHelper;
-use App\Entity\Realm;
 use App\Entity\RealmContact;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -80,7 +79,7 @@ class RealmContactCrudController extends AbstractCrudController
                 ->setChoices($this->contactHelper->getAllContacts()));
     }
 
-    /** @return array<Realm> */
+    /** @return array<string> */
     public function getContactsChoicesOfUser(): array
     {
         return $this->realmHelper->getAllRealms();

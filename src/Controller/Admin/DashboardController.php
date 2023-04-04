@@ -109,7 +109,7 @@ class DashboardController extends AbstractDashboardController
 
     public function configureUserMenu(UserInterface $user): UserMenu
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request      = $this->requestStack->getCurrentRequest();
         $firewallName = $this->security->getFirewallConfig($request)?->getName();
 
         if ($firewallName === 'main') {

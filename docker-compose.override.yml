@@ -9,6 +9,7 @@ services:
       APP_ENV: dev
       XDEBUG_MODE: 'debug'
       PHP_IDE_CONFIG: serverName=symfony
+      SERVER_NAME: 'ibuildings.localhost'
     extra_hosts:
       # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway

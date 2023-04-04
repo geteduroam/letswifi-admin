@@ -15,8 +15,9 @@ use App\Entity\RealmContact;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+
+use function in_array;
 
 /**
  * @extends ServiceEntityRepository<Realm>
@@ -66,6 +67,8 @@ class RealmRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<string> $roles
+     *
      * @throws NonUniqueResultException
      * @throws NoResultException
      */

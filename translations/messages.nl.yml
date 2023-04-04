@@ -18,11 +18,12 @@ RevokeQuestion: Wilt u dit account intrekken?
 NoUndoOperation: Deze actie kan niet ongedaan worden gemaakt.
 LogInButton: Login
 SaveChanges: Wijzigingen opslaan
-Cancel: Annuleren
+BackToListing: Terug naar overzicht
 LogIn: Inloggen!
 LoggedInAs: U bent ingelogd als
-Admins: Administrators
+Admins: Administrator accounts
 Configuration: Configuratie
+Configurations: Configurations
 Signer: Signer
 SignerDay: Dag van ondertekening
 SignerDateTime: Signeertijdstip
@@ -44,3 +45,16 @@ ValidAccounts: Geldige accounts
 FirstIssued: Eerste aangevraagd
 LastValid: Laaste verlopen
 Expires: Verlopen
+AdminRealms: Administrator realms
+RealmContact: Realm
+Administrator: Administrator
+Contact: Administrator
+NetworkProfile: Netwerkprofiel
+Type: Type
+Name: Naam
+Value: Waarde
+VhostRealm: vHost realm
+HttpHost: Http host
+PathPrefix: Path prefix
+AuthService: Authentication service
+AuthConfiguration: Authentication configuratiw

@@ -11,9 +11,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\RealmSignerRepository;
-use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Exception;
 
 #[ORM\Entity(repositoryClass: RealmSignerRepository::class)]
 class RealmSigner
@@ -54,21 +52,14 @@ class RealmSigner
         return $this;
     }
 
-    /** @throws Exception */
-    public function getDefaultValidityDays(): DateTime|null
+    public function getDefaultValidityDays(): int
     {
-        if ($this->defaultValidityDays) {
-            $date = new DateTime();
-
-            return $date->setTimestamp($this->defaultValidityDays);
-        }
-
-        return null;
+        return $this->defaultValidityDays;
     }
 
-    public function setDefaultValidityDays(DateTime $defaultValidityDays): self
+    public function setDefaultValidityDays(int $defaultValidityDays): self
     {
-        $this->defaultValidityDays = $defaultValidityDays->getTimestamp();
+        $this->defaultValidityDays = $defaultValidityDays;
 
         return $this;
     }

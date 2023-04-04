@@ -10,25 +10,36 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
-use _PHPStan_1f608dc6a\Nette\Neon\Exception;
 use App\Entity\Contact;
+use App\Entity\NetworkProfile;
 use App\Entity\Realm;
+use App\Entity\RealmContact;
+use App\Entity\RealmHelpdesk;
 use App\Entity\RealmSigningLog;
 use App\Entity\RealmSigningUser;
+use App\Entity\VhostRealm;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Exception;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use function count;
 
 class DashboardController extends AbstractDashboardController
 {
-    public function __construct(private readonly ManagerRegistry $doctrine)
-    {
+    public function __construct(
+        private readonly ManagerRegistry $doctrine,
+        private Security $security,
+        private RequestStack $requestStack,
+    ) {
         $connection = $this->doctrine->getConnection();
         $connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
     }
@@ -48,7 +59,6 @@ class DashboardController extends AbstractDashboardController
             throw new Exception('You have no access to this resource');
         }
 
-        //return $this->render('@EasyAdmin/page/content.html.twig');
         return $this->render('bundles/easyAdminBundle/dashboard.html.twig', [
             'realms' => $this->getRealms(),
             'pseudoAccounts' => $this->getPseudoAccounts(),
@@ -64,7 +74,6 @@ class DashboardController extends AbstractDashboardController
             throw new Exception('You have no access to this resource');
         }
 
-        //return $this->render('@EasyAdmin/page/content.html.twig');
         return $this->render('bundles/easyAdminBundle/dashboard.html.twig', [
             'realms' => $this->getRealms(),
             'pseudoAccounts' => $this->getPseudoAccounts(),
@@ -91,15 +100,48 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-dashboard');
-        yield MenuItem::linkToCrud('Configuration', 'fas fa-gear', Realm::class)
-            ->setPermission('ROLE_SUPER_ADMIN');
+        yield MenuItem::subMenu('Configuration', 'fa fas fa-gear')
+            ->setSubItems([
+                MenuItem::linkToCrud('Configuration', 'fas fa-gear', Realm::class)
+                    ->setPermission('ROLE_SUPER_ADMIN'),
+                MenuItem::linkToCrud('NetworkProfile', 'fas fa-network-wired', NetworkProfile::class)
+                    ->setPermission('ROLE_SUPER_ADMIN'),
+                MenuItem::linkToCrud('VhostRealm', 'fas fa-server', VhostRealm::class)
+                    ->setPermission('ROLE_SUPER_ADMIN'),
+                MenuItem::linkToCrud('Helpdesk', 'fas fa-hands-helping', RealmHelpdesk::class)
+                    ->setPermission('ROLE_SUPER_ADMIN'),
+            ])->setPermission('ROLE_SUPER_ADMIN');
 
         yield MenuItem::linkToCrud('PseudoAccounts', 'fas fa-users', RealmSigningLog::class);
         yield MenuItem::linkToCrud('UserAccounts', 'fas fa-user-circle', RealmSigningUser::class);
-        yield MenuItem::linkToCrud('Admins', 'fas fa-user-cog', Contact::class)
-            ->setPermission('ROLE_SUPER_ADMIN');
+
+        yield MenuItem::subMenu('Administrator', 'fa fas fa-user')
+            ->setSubItems([
+                MenuItem::linkToCrud('Accounts', 'fas fa-user-cog', Contact::class)
+                    ->setPermission('ROLE_SUPER_ADMIN'),
+                MenuItem::linkToCrud('Realms', 'fas fa-toolbox', RealmContact::class)
+            ->setPermission('ROLE_SUPER_ADMIN'),
+            ])->setPermission('ROLE_SUPER_ADMIN');
     }
 
+    public function configureUserMenu(UserInterface $user): UserMenu
+    {
+        $request      = $this->requestStack->getCurrentRequest();
+        $firewallName = $this->security->getFirewallConfig($request)?->getName();
+
+        if ($firewallName === 'main') {
+            return parent::configureUserMenu($user);
+        }
+
+        /** No logout otherwise */
+        return UserMenu::new()
+            ->displayUserName()
+            ->displayUserAvatar()
+            ->setName($user->getUserIdentifier())
+            ->setAvatarUrl(null);
+    }
+
+    /** @throws Exception */
     private function getRealms(): int
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
@@ -108,9 +150,10 @@ class DashboardController extends AbstractDashboardController
 
         return count($this->doctrine->getRepository(
             Realm::class,
-        )->findByUser($this->getUser()->getId()));
+        )->findByUser($this->getUser()->getContact()->getId()));
     }
 
+    /** @throws Exception */
     private function getPseudoAccounts(): int
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
@@ -119,9 +162,10 @@ class DashboardController extends AbstractDashboardController
 
         return count($this->doctrine->getRepository(
             RealmSigningLog::class,
-        )->findByUserId($this->getUser()->getId()));
+        )->findByUserId($this->getUser()->getContact()->getId()));
     }
 
+    /** @throws Exception */
     private function getUserAccounts(): int
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
@@ -130,6 +174,6 @@ class DashboardController extends AbstractDashboardController
 
         return count($this->doctrine->getRepository(
             RealmSigningUser::class,
-        )->findByUserId($this->getUser()->getId()));
+        )->findByUserId($this->getUser()->getContact()->getId()));
     }
 }

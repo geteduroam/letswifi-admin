@@ -12,8 +12,13 @@ namespace App\Entity;
 
 use App\Repository\RealmContactRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: RealmContactRepository::class)]
+#[UniqueEntity(
+    fields: ['realm', 'contact'],
+    message: 'The realm is already assigned to the contact.',
+)]
 class RealmContact
 {
     #[ORM\Id]
@@ -30,6 +35,11 @@ class RealmContact
 
     public function __construct()
     {
+    }
+
+    public function __toString(): string
+    {
+        return $this->getRealm()->getRealm();
     }
 
     public function getId(): int|null

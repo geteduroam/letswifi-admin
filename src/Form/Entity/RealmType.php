@@ -12,12 +12,13 @@ namespace App\Form\Entity;
 
 use App\Application\Command\SaveRealmCommand;
 use App\Entity\CA;
+use App\Entity\NetworkProfile;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -53,13 +54,27 @@ class RealmType extends AbstractType
             )
             ->add(
                 'signerDays',
-                DateTimeType::class,
+                IntegerType::class,
                 [
-                    'attr' => ['placeholder' => 'SignerDateTime'],
                     'label' => 'SignerDays',
                     'required' => true,
                 ],
             )
+            ->add(
+                'selectedNetworkProfiles',
+                ChoiceType::class,
+                [
+                    'label' => 'NetworkProfile',
+                    'choices' => $saveRealmCommand->getNetworkProfiles(),
+                    'choice_value' => 'id',
+                    'choice_label' => static function (NetworkProfile|null $networkProfile) {
+                        return $networkProfile ? $networkProfile->getTypeName() . ' ' . $networkProfile->getName() . ' ' . $networkProfile->getValue() : '';
+                    },
+                    'required' => true,
+                    'multiple' => true,
+                ],
+            )
+
             ->add(
                 'trustedCAs',
                 ChoiceType::class,
@@ -67,63 +82,20 @@ class RealmType extends AbstractType
                     'label' => 'TrustedCAs',
                     'choices' => $saveRealmCommand->getCas(),
                     'multiple' => true,
-                    'expanded' => true,
+                    'expanded' => false,
                 ],
             )
             ->add(
-                'key',
-                TextType::class,
-                ['required' => true],
-            )
-            ->add('refreshKey', ButtonType::class, ['attr' => ['class' => 'btn btn-primary']])
-            ->add(
-                'vhost',
-                TextType::class,
-                [
-                    'label' => 'vhost',
-                    'required' => true,
-                ],
-            )
-            ->add(
-                'oid',
-                TextType::class,
-                [
-                    'label' => 'OID',
-                    'required' => true,
-                ],
-            )
-            ->add(
-                'ssid',
-                TextType::class,
-                [
-                    'label' => 'SSID',
-                    'required' => true,
-                ],
-            )
-            ->add(
-                $builder->create('Helpdesk', FormType::class, ['inherit_data' => true])
+                $builder->create('RefreshKey', FormType::class, [
+                    'inherit_data' => true,
+                    'required' => false,
+                ])
                 ->add(
-                    'emailAddress',
-                    TextType::class,
+                    'refreshKey',
+                    CheckboxType::class,
                     [
-                        'label' => 'EmailAddress',
-                        'required' => true,
-                    ],
-                )
-                ->add(
-                    'web',
-                    TextType::class,
-                    [
-                        'label' => 'Website',
-                        'required' => true,
-                    ],
-                )
-                ->add(
-                    'phone',
-                    TextType::class,
-                    [
-                        'label' => 'PhoneNumber',
-                        'required' => true,
+                        'label' => 'refresh',
+                        'required' => false,
                     ],
                 ),
             ),

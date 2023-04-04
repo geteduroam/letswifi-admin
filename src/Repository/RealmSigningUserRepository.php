@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Realm;
+use App\Entity\RealmContact;
 use App\Entity\RealmSigningUser;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -48,5 +50,17 @@ class RealmSigningUserRepository extends ServiceEntityRepository
         }
 
         $this->getEntityManager()->flush();
+    }
+
+    /** @return array<RealmSigningUser>|null */
+    public function findByUserId(int $id): array|null
+    {
+        return $this->createQueryBuilder('rs')
+            ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
+            ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
+            ->andWhere('rc.contact = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getArrayResult();
     }
 }

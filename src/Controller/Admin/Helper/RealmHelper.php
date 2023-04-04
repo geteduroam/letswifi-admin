@@ -14,6 +14,8 @@ use App\Entity\Realm;
 use App\Repository\RealmRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use function count;
+
 class RealmHelper
 {
     public function __construct(private readonly RealmRepository $realmRepository)
@@ -30,7 +32,7 @@ class RealmHelper
         $choices = [];
 
         foreach ($realms as $realm) {
-            $choices[$realm->getRealm()] = $realm->getRealm();
+            $choices[$realm->getRealm()] = $realm;
         }
 
         return $choices;
@@ -39,9 +41,15 @@ class RealmHelper
     /** @return array<string> */
     public function getUserRealms(UserInterface $user): array
     {
-        $realms = $this->realmRepository->findByUser($user->getId());
+        $realms = $this->realmRepository->findByUser($user->getContact()->getId());
 
-        return $this->getRealmsAsStrings($realms);
+        $realmStrings = $this->getRealmsAsStrings($realms);
+
+        if (count($realmStrings) === 0) {
+            $realmStrings['no realms'] = 'no realms';
+        }
+
+        return $realmStrings;
     }
 
     /** @return array<string> */

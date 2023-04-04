@@ -10,25 +10,25 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\RealmOid;
+use App\Entity\NetworkProfile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<RealmOid>
- * @method RealmOid|null find($id, $lockMode = null, $lockVersion = null)
- * @method RealmOid|null findOneBy(array $criteria, array $orderBy = null)
- * @method RealmOid[]    findAll()
- * @method RealmOid[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<NetworkProfile>
+ * @method NetworkProfile|null find($id, $lockMode = null, $lockVersion = null)
+ * @method NetworkProfile|null findOneBy(array $criteria, array $orderBy = null)
+ * @method NetworkProfile[]    findAll()
+ * @method NetworkProfile[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class RealmOidRepository extends ServiceEntityRepository
+class NetworkProfileRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, RealmOid::class);
+        parent::__construct($registry, NetworkProfile::class);
     }
 
-    public function save(RealmOid $entity, bool $flush = false): void
+    public function save(NetworkProfile $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -39,7 +39,7 @@ class RealmOidRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function remove(RealmOid $entity, bool $flush = false): void
+    public function remove(NetworkProfile $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 

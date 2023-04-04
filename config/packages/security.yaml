@@ -4,11 +4,14 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
-        app_user_provider:
+#        users_in_memory: { memory: null }
+#        app_user_provider:
+        users:
             entity:
                 class: App\Entity\Contact
-                property: emailAddress
+                property: email
+        saml-provider:
+            id: App\Security\SamlBundle\Authentication\SamlProvider
 
     role_hierarchy:
         ROLE_ADMIN: ROLE_USER
@@ -22,23 +25,21 @@ security:
 #        login_firewall:
 #                pattern: ^/saml/metadata
 #
-#        saml_based:
-#            custom_authenticators:
-#                - Surfnet\SamlBundle\Security\Authentication\SamlAuthenticator
-
-        # In this stage of dev the saml_based login could not be tested and therefor the local login is used
+        saml_based:
+            custom_authenticators:
+                - Surfnet\SamlBundle\Security\Authentication\SamlAuthenticator
         main:
-            lazy: true
-            provider: app_user_provider
+#            lazy: true
+#            provider: users_in_memory
 
-            form_login:
-                # "app_login" is the name of the route created previously
-                login_path: app_login
-                check_path: app_login
-                enable_csrf: true
-
-            logout:
-                path: app_logout
+#            form_login:
+#                # "app_login" is the name of the route created previously
+#                login_path: app_login
+#                check_path: app_login
+#                enable_csrf: true
+#            custom_authenticator: App\Security\Authenticator\LoginFormAuthenticator
+#            logout:
+#                path: app_logout
                 # where to redirect after logout
                 # target: app_any_route
             # activate different ways to authenticate

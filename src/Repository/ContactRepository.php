@@ -63,4 +63,15 @@ class ContactRepository extends ServiceEntityRepository
 
         return reset($contacts);
     }
+
+    public function findByEmail(string $email): Contact|null
+    {
+        $contacts = parent::findBy(['emailAddress' => $email]);
+
+        if (count($contacts) === 0) {
+            return null;
+        }
+
+        return reset($contacts);
+    }
 }

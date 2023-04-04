@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
-use App\Controller\Admin\Helper\IndexQueryBuilderHelper;
 use App\Entity\Contact;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
@@ -21,7 +20,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 class ContactCrudController extends AbstractCrudController
 {
     public function __construct(
-        private readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
     ) {
     }
 

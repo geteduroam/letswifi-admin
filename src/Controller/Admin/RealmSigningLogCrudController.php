@@ -39,15 +39,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class RealmSigningLogCrudController extends AbstractCrudController
 {
     public function __construct(
-        private readonly TokenStorageInterface $tokenStorage,
         private readonly RealmHelper $realmHelper,
         private readonly RealmSigningLogHelper $realmSigningLogHelper,
-        protected readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
+        private readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
     ) {
     }
 
@@ -60,7 +58,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
     {
         return $crud
             ->setEntityPermission('ROLE_ADMIN')
-            ->setPageTitle('index', 'Pseudo accounts');
+            ->setPageTitle('index', 'PseudoAccounts');
     }
 
     /**
@@ -72,7 +70,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
         return [
             IdField::new('serial', 'Serial'),
             TextField::new('requester'),
-            TextField::new('subjectWithoutCustomerName', 'Pseudo account'),
+            TextField::new('subjectWithoutCustomerName', 'PseudoAccount'),
             AssociationField::new('realm')
                 ->formatValue(static function ($value, $entity) {
                     return $entity->getRealm()->getRealm();
@@ -80,7 +78,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
             DateTimeField::new('expires', 'ValidUntil')
                 ->setFormat('yyyy-MM-dd')
                 ->formatValue(static function ($value, $entity) {
-                    return $value ? $value : '-';
+                    return $value ?? '-';
                 }),
             BooleanField::new('revoked')
                 ->renderAsSwitch(false)
@@ -140,8 +138,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
         FilterCollection $filters,
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
-
-        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder);
+        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder, $this->getUser()->getRoles(), $this->getUser()->getId());
     }
 
     /**
@@ -168,12 +165,12 @@ class RealmSigningLogCrudController extends AbstractCrudController
     }
 
     /** @return array<Realm> */
-    public function getRealmsChoicesOfUser(): array
+    private function getRealmsChoicesOfUser(): array
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             return $this->realmHelper->getAllRealms();
         }
 
-        return $this->realmHelper->getUserRealms($this->tokenStorage->getToken()->getUser());
+        return $this->realmHelper->getUserRealms($this->getUser());
     }
 }

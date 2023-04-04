@@ -10,8 +10,8 @@ declare(strict_types=1);
 
 namespace App\Form\Entity;
 
+use App\Application\Command\SaveRealmCommand;
 use App\Entity\CA;
-use App\Entity\SaveRealmCommand;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;

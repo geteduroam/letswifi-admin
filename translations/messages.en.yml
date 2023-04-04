@@ -38,9 +38,10 @@ PhoneNumber: Phone number
 FormDidNotPassValidation: The form did not pass the validation.
 ValidUntil: Valid until
 UserAccounts: User accounts
-PseudoAccounts: Pseudo accounts
 Accounts: Accounts
 ValidAccounts: Valid accounts
 FirstIssued: First issued
 LastValid: Last valid until
 Expires: Expires
+PseudoAccounts: Pseudo accounts
+PseudoAccount: Pseudo account

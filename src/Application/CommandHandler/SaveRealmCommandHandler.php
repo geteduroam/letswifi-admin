@@ -28,7 +28,7 @@ class SaveRealmCommandHandler
     ) {
     }
 
-    public function saveRealm(SaveRealmCommand $command): void
+    public function save(SaveRealmCommand $command): void
     {
         $this->saveRealmSigner($command);
         $this->saveRealmTrusts($command);

@@ -3657,10 +3657,10 @@ node-sass@^8.0.0:
     stdout-stream "^1.4.0"
     "true-case-path" "^2.2.1"
 
-node@^19.6.1:
-  version "19.6.1"
-  resolved "https://registry.npmjs.org/node/-/node-19.6.1.tgz"
-  integrity sha512-byYg3LxtFgNG0vINZMk4iX3Aa7p8Uc3t3WOQfZMwXcIiCzSTOXNbPOEmbrTSI73yrrfhr6IsutbLnN+/PBSaSA==
+node@^19.8.1:
+  version "19.8.1"
+  resolved "https://registry.yarnpkg.com/node/-/node-19.8.1.tgz#81b5c241369d1b37a98aecf9045ee7b7f11351f1"
+  integrity sha512-qAoX6xM9F/eEv4q4qgCXGSbXWruHVzVJX32XCZizSUNsg5ywYY7di9QMqSDFmPwvJrXjZuhNq2z80+lR9GumLg==
   dependencies:
     node-bin-setup "^1.0.0"
 
@@ -4464,10 +4464,10 @@ sass-graph@^4.0.1:
     scss-tokenizer "^0.4.3"
     yargs "^17.2.1"
 
-sass-loader@^13.2.0:
-  version "13.2.1"
-  resolved "https://registry.yarnpkg.com/sass-loader/-/sass-loader-13.2.1.tgz#5255c9aa5ad6c8f8c869ddf5d48e71fd48ba4b81"
-  integrity sha512-VQUrgUa5/waIzMrzyuko3sj5WD9NMsYph91cNICx+OaODbRtLl6To2fswLx8MH2qNxXFqRtpvdPQIa7mE93YOA==
+sass-loader@^13.2.2:
+  version "13.2.2"
+  resolved "https://registry.yarnpkg.com/sass-loader/-/sass-loader-13.2.2.tgz#f97e803993b24012c10d7ba9676548bf7a6b18b9"
+  integrity sha512-nrIdVAAte3B9icfBiGWvmMhT/D+eCDwnk+yA7VE/76dp/WkHX+i44Q/pfo71NYbwj0Ap+PGsn0ekOuU1WFJ2AA==
   dependencies:
     klona "^2.0.6"
     neo-async "^2.6.2"

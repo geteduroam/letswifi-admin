@@ -37,8 +37,8 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private readonly ManagerRegistry $doctrine,
-        private Security $security,
-        private RequestStack $requestStack,
+        private readonly Security $security,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -53,10 +53,6 @@ class DashboardController extends AbstractDashboardController
     #[Route('/admin', name: 'admin_default_locale')]
     public function indexDefaultLocale(): Response
     {
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException();
-        }
-
         return $this->render('bundles/easyAdminBundle/dashboard.html.twig', [
             'realms' => $this->getRealms(),
             'users' => $this->countUsers(),

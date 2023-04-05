@@ -55,19 +55,15 @@ class RealmController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
-            try {
-                if ($form->isValid()) {
-                    $command = $form->getData();
-                    if ($this->isSaveAction($request)) {
-                        $this->saveRealm($command);
-                    }
-
-                    return $this->redirect($referrer);
-                } else {
-                    $this->addFlash('error', 'FormDidNotPassValidation');
+            if ($form->isValid()) {
+                $command = $form->getData();
+                if ($this->isSaveAction($request)) {
+                    $this->saveRealm($command);
                 }
-            } catch (InvalidArgumentException $exception) {
-                $this->addFlash('error', $exception->getMessage());
+
+                return $this->redirect($referrer);
+            } else {
+                $this->addFlash('error', 'FormDidNotPassValidation');
             }
         }
 

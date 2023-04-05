@@ -11,8 +11,6 @@ declare(strict_types=1);
 namespace App\Security\Voter;
 
 use App\Entity\Realm;
-use App\Entity\RealmSigningLog;
-use App\Entity\RealmSigningUser;
 use App\Security\SamlBundle\Identity;
 use LogicException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -21,14 +19,14 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use function assert;
 use function in_array;
 
-class RealmSigningLogVoter extends Voter
+class RealmVoter extends Voter
 {
     public const EDIT = 'edit';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         // if the attribute isn't one we support, return false
-        return ($subject instanceof RealmSigningLog)
+        return ($subject instanceof Realm)
             && $attribute === self::EDIT;
     }
 
@@ -44,17 +42,19 @@ class RealmSigningLogVoter extends Voter
             return true;
         }
 
-        assert($subject instanceof RealmSigningLog);
+        assert(
+            $subject instanceof Realm,
+        );
 
         return match ($attribute) {
-            self::EDIT => $this->canEdit($subject, $user),
+            self::EDIT => $this->canEditRealm($subject, $user),
             default => throw new LogicException('This code should not be reached!')
         };
     }
 
-    private function canEdit(RealmSigningLog $realmSigningLog, Identity $user): bool
+    private function canEditRealm(Realm $realm, Identity $user): bool
     {
         return $user->getContact()->getSuperAdmin() ||
-            $user->getContact()->isOwnerOfRealm($realmSigningLog->getRealm());
+            $user->getContact()->isOwnerOfRealm($realm);
     }
 }

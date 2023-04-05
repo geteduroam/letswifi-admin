@@ -48,13 +48,11 @@ class RealmKey
         return $this;
     }
 
-    /** @return resource */
-    public function getKey()
+    public function getKey(): string
     {
-        return $this->key;
+        return stream_get_contents($this->key);
     }
 
-    /** @param resource $key */
     public function setKey($key): self
     {
         $this->key = $key;
@@ -86,13 +84,8 @@ class RealmKey
         return $this;
     }
 
-    public function generateKey(): string
+    public function generateKey(): void
     {
-        return base64_encode(random_bytes(32));
-    }
-
-    public function getKeyAsString(): string
-    {
-        return stream_get_contents($this->key);
+        $this->setKey(base64_encode(random_bytes(32)));
     }
 }

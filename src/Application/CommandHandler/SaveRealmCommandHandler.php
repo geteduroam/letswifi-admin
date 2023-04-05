@@ -59,8 +59,7 @@ class SaveRealmCommandHandler
             return;
         }
 
-        $key = $realm->getRealmKey()->generateKey();
-        $realm->getRealmKey()->setKey($key);
+        $realm->getRealmKey()->generateKey();
         $this->realmKeyRepository->save($realm->getRealmKey(), true);
     }
 

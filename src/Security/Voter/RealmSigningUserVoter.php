@@ -21,14 +21,14 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use function assert;
 use function in_array;
 
-class RealmSigningLogVoter extends Voter
+class RealmSigningUserVoter extends Voter
 {
     public const EDIT = 'edit';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         // if the attribute isn't one we support, return false
-        return ($subject instanceof RealmSigningLog)
+        return ($subject instanceof RealmSigningUser)
             && $attribute === self::EDIT;
     }
 
@@ -44,17 +44,19 @@ class RealmSigningLogVoter extends Voter
             return true;
         }
 
-        assert($subject instanceof RealmSigningLog);
+        assert(
+            $subject instanceof RealmSigningUser
+        );
 
         return match ($attribute) {
-            self::EDIT => $this->canEdit($subject, $user),
+            self::EDIT => $this->canEditRealmSigningUser($subject, $user),
             default => throw new LogicException('This code should not be reached!')
         };
     }
 
-    private function canEdit(RealmSigningLog $realmSigningLog, Identity $user): bool
+    private function canEditRealmSigningUser(RealmSigningUser $realmSigningUser, Identity $user): bool
     {
         return $user->getContact()->getSuperAdmin() ||
-            $user->getContact()->isOwnerOfRealm($realmSigningLog->getRealm());
+            $user->getContact()->isOwnerOfRealm($realmSigningUser->getRealm());
     }
 }

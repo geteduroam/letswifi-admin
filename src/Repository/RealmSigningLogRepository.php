@@ -2,12 +2,24 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of letswifi; a system for easy eduroam device enrollment
+ * Copyright: 2023, Paul Dekkers, SURF <paul.dekkers@surf.nl>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 namespace App\Repository;
 
+use App\Entity\Realm;
+use App\Entity\RealmContact;
 use App\Entity\RealmSigningLog;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
+
+use function in_array;
 
 /**
  * @extends ServiceEntityRepository<RealmSigningLog>
@@ -47,6 +59,11 @@ class RealmSigningLogRepository extends ServiceEntityRepository
 
     public function revoke(RealmSigningLog $entity, bool $flush = false): void
     {
+        // Do not revoke again!
+        if ($entity->getRevoked()) {
+            return;
+        }
+
         // revoke by setting the expiration date time to 'now'
         $entity->setRevoked(new DateTime());
         $this->getEntityManager()->persist($entity);
@@ -56,5 +73,72 @@ class RealmSigningLogRepository extends ServiceEntityRepository
         }
 
         $this->getEntityManager()->flush();
+    }
+
+    public function revokeById(int $id, bool $flush = false): void
+    {
+        $entity = $this->find($id);
+        $this->revoke($entity, $flush);
+    }
+
+    /** @return array<RealmSigningLog>|null */
+    public function findByUserId(int $id): array|null
+    {
+        return $this->createQueryBuilder('rs')
+            ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
+            ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
+            ->andWhere('rc.contact = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    /** @return array<RealmSigningLog>|null */
+    public function findByUserIdGroupByRequester(int $id): array|null
+    {
+        return $this->createQueryBuilder('rs')
+            ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
+            ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
+            ->andWhere('rc.contact = :id')
+            ->setParameter('id', $id)
+            ->groupBy('rs.requester')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    /**
+     * @param array<string> $roles
+     *
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function countRealmSigningLogsForRole(array $roles, int $id): int
+    {
+        if (in_array('ROLE_SUPER_ADMIN', $roles)) {
+            return $this->count([]);
+        }
+
+        $queryBuilder = $this->createQueryBuilder('rs');
+
+        return $queryBuilder
+            ->select($queryBuilder->expr()->count('rs'))
+            ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
+            ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
+            ->andWhere('rc.contact = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /** @return array<RealmSigningLog>|null */
+    public function findByRequesterAndRealm(string $requester, string $realm): array|null
+    {
+        return $this->createQueryBuilder('rs')
+            ->andWhere('rs.requester = :requester')
+            ->andWhere('rs.realm = :realm')
+            ->setParameter('requester', $requester)
+            ->setParameter('realm', $realm)
+            ->getQuery()
+            ->getResult();
     }
 }

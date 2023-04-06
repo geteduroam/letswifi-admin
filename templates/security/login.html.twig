@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'LogIn'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+<form method="post" class="form-signin">
+    {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="mb-3">
+            {{ 'LoggedInAs'|trans }} {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+        </div>
+    {% endif %}
+
+    <h1 class="h3 mb-3 font-weight-normal">{{ 'SignInTitle'|trans }}</h1>
+    <label for="inputEmailAddress">{{ 'EmailAddress'|trans }}</label>
+    <input type="email" value="{{ last_username }}" name="_username" id="inputEmailAddress" class="form-control" autocomplete="email" required autofocus>
+    <label for="inputPassword">{{ 'Password'|trans }}</label>
+    <input type="password" name="_password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+    <div class="checkbox mb-3"></div>
+    <label>
+        <input type="checkbox" name="_remember_me"> {{ 'RememberMe'|trans }}</input>
+    </label>
+
+    <button type="submit">{{ 'LogInButton'| trans }}</button>
+</form>
+{% endblock %}

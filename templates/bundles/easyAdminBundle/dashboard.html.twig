@@ -1,0 +1,36 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{# Let\'s remove/empty the header #}
+{% block content_header_wrapper %} {% endblock content_header_wrapper %}
+
+{# The main page content block #}
+{% block main %}
+    <article class="content">
+        <section class="content-header">
+
+            <div class="content-header-title">
+                <h1>{{ 'Dashboard'|trans }}</h1>
+            </div>
+
+
+        </section>
+
+        <div class="page-actions">
+
+                <button type="button" class="btn btn-primary">
+                    {{ 'Configurations'|trans  }} <span class="badge text-bg-secondary">{{ realms }}</span>
+                </button>
+
+                <button type="button" class="btn btn-primary">
+                    {{ 'Users'|trans }} <span class="badge text-bg-secondary">{{ users }}</span>
+                </button>
+
+                <button type="button" class="btn btn-primary">
+                    {{ 'PseudoAccounts'|trans }} <span class="badge text-bg-secondary">{{ pseudoAccounts }}</span>
+                </button>
+        </div>
+    </article>
+{% endblock main %}
+
+{# Let\'s remove/empty the footer #}
+{% block content_footer_wrapper %} {% endblock content_footer_wrapper %}

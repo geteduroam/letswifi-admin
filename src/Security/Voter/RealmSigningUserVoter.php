@@ -10,8 +10,7 @@ declare(strict_types=1);
 
 namespace App\Security\Voter;
 
-use App\Entity\Realm;
-use App\Entity\RealmSigningLog;
+use App\Entity\Contact;
 use App\Entity\RealmSigningUser;
 use App\Security\SamlBundle\Identity;
 use LogicException;
@@ -36,7 +35,7 @@ class RealmSigningUserVoter extends Voter
     {
         $user = $token->getUser();
 
-        if (!$user instanceof Identity) {
+        if (!$user instanceof Identity && !$user instanceof Contact) {
             return false;
         }
 
@@ -45,7 +44,7 @@ class RealmSigningUserVoter extends Voter
         }
 
         assert(
-            $subject instanceof RealmSigningUser
+            $subject instanceof RealmSigningUser,
         );
 
         return match ($attribute) {

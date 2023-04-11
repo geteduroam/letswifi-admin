@@ -121,7 +121,7 @@ class RealmSigningUserCrudController extends AbstractCrudController
 
     public function configureAssets(Assets $assets): Assets
     {
-        $assets->addJsFile('/assets/js/confirm-modal.js');
+        $assets->addWebpackEncoreEntry('app');
 
         return parent::configureAssets($assets);
     }
@@ -134,9 +134,11 @@ class RealmSigningUserCrudController extends AbstractCrudController
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder,
+        return $this->indexQueryBuilderHelper->buildRealmQuery(
+            $queryBuilder,
             $this->getUser()->getRoles(),
-            $this->getUser()->getId());
+            $this->getUser()->getId(),
+        );
     }
 
     /**

@@ -53,7 +53,7 @@ class RealmKey
         return stream_get_contents($this->key);
     }
 
-    public function setKey($key): self
+    public function setKey(string $key): self
     {
         $this->key = $key;
 

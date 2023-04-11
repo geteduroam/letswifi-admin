@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Security\Voter;
 
+use App\Entity\Contact;
 use App\Entity\Realm;
 use App\Security\SamlBundle\Identity;
 use LogicException;
@@ -34,7 +35,7 @@ class RealmVoter extends Voter
     {
         $user = $token->getUser();
 
-        if (!$user instanceof Identity) {
+        if (!$user instanceof Identity && !$user instanceof Contact) {
             return false;
         }
 

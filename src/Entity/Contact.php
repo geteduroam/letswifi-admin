@@ -128,7 +128,7 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserIdentifier(): string
     {
-        return $this->getEmailAddress();
+        return $this->getUserId();
     }
 
     public function setPassword(string $password): self

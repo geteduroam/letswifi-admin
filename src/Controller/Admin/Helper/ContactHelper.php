@@ -29,7 +29,7 @@ class ContactHelper
         $choices = [];
 
         foreach ($contacts as $contact) {
-            $choices[$contact->getEmailAddress()] = $contact;
+            $choices[$contact->getUserId()] = $contact;
         }
 
         return $choices;

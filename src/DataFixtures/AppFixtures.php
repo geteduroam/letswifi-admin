@@ -21,7 +21,7 @@ class AppFixtures extends Fixture
         $superAdmin = new Contact();
         $superAdmin->setNameId('super');
         $superAdmin->setDisplayName('Super');
-        $superAdmin->setEmailAddress('super@super.nl');
+        $superAdmin->setUserId('super@super.nl');
         $superAdmin->setPassword('$2y$13$zQb6nVLleImMZgvrDXyVk.v7Wdwn9IsaA/O.Rceci2ipIAYfrS6M6');
         $superAdmin->setSuperAdmin(true);
 

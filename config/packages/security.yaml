@@ -7,7 +7,7 @@ security:
         users:
             entity:
                 class: App\Entity\Contact
-                property: emailAddress
+                property: userId
         saml-provider:
             id: App\Security\SamlBundle\Authentication\SamlProvider
 

@@ -56,7 +56,7 @@ class RealmContactCrudController extends AbstractCrudController
                 }),
             AssociationField::new('contact')
                 ->formatValue(static function ($value, $entity) {
-                    return $entity->getContact()->getEmailAddress();
+                    return $entity->getContact()->getUserId();
                 }),
         ];
     }

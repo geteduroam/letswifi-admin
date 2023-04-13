@@ -53,7 +53,7 @@ class DashboardController extends AbstractDashboardController
     #[Route('/admin', name: 'admin_default_locale')]
     public function indexDefaultLocale(): Response
     {
-        return $this->render('bundles/easyAdminBundle/dashboard.html.twig', [
+        return $this->render('bundles/EasyAdminBundle/dashboard.html.twig', [
             'realms' => $this->getRealms(),
             'users' => $this->countUsers(),
             'pseudoAccounts' => $this->getPseudoAccounts(),

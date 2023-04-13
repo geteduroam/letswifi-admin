@@ -67,7 +67,7 @@ class RealmController extends AbstractController
             }
         }
 
-        return $this->render('bundles/easyAdminBundle/realm.html.twig', [
+        return $this->render('bundles/EasyAdminBundle/realm.html.twig', [
             'form' => $form->createView(),
             'title' => 'Realm',
         ]);

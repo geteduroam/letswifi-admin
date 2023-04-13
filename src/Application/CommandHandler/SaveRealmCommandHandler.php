@@ -40,6 +40,10 @@ class SaveRealmCommandHandler
     {
         $realmSigner = $this->realmSignerRepository->find($command->getRealm());
 
+        if ($realmSigner === null) {
+            return;
+        }
+
         $realmSigner->setSignerCaSub($command->getCa());
         $realmSigner->setDefaultValidityDays($command->getSignerDays());
 
@@ -53,9 +57,13 @@ class SaveRealmCommandHandler
 
     private function saveRealmKey(SaveRealmCommand $command): void
     {
+        if (!$command->getRefreshKey()) {
+            return;
+        }
+
         $realm = $this->realmRepository->findOneBy(['realm' => $command->getRealm()]);
 
-        if (!$command->getRefreshKey()) {
+        if ($realm?->getRealmKey() === null) {
             return;
         }
 

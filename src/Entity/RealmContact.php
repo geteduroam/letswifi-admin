@@ -27,7 +27,7 @@ class RealmContact
     private int|null $id = null;
 
     #[ORM\ManyToOne(targetEntity: Contact::class, inversedBy: 'realmContacts')]
-    private Contact $contact;
+    private Contact|null $contact = null;
 
     #[ORM\ManyToOne(targetEntity: Realm::class, inversedBy: 'realmContacts')]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]

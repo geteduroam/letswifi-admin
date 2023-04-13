@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 use function count;
 use function gettype;
+use function is_array;
 use function is_object;
 use function is_string;
 use function reset;
@@ -92,8 +93,7 @@ class SamlProvider implements SamlProviderInterface, UserProviderInterface
     private function getSingleStringValue(string $attribute, AssertionAdapter $translatedAssertion): string
     {
         $values = $translatedAssertion->getAttributeValue($attribute);
-
-        if ($values === null || count($values) === 0) {
+        if (!is_array($values) || count($values) === 0) {
             $message = sprintf(
                 'No value(s) found for attribute "%s"',
                 $attribute,

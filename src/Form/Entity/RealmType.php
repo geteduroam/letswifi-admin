@@ -25,9 +25,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RealmType extends AbstractType
 {
-    /** @param array<Object|string> $options */
+    /** @param array<string, mixed> $options */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        if (!($options['data'] instanceof SaveRealmCommand)) {
+            return;
+        }
+
         $saveRealmCommand = $options['data'];
 
         $builder->add(
@@ -68,7 +72,7 @@ class RealmType extends AbstractType
                     'choices' => $saveRealmCommand->getNetworkProfiles(),
                     'choice_value' => 'id',
                     'choice_label' => static function (NetworkProfile|null $networkProfile) {
-                        return $networkProfile ? $networkProfile->getTypeName()
+                        return $networkProfile !== null ? $networkProfile->getTypeName()
                             . ' ' . $networkProfile->getName() . ' ' . $networkProfile->getValue() : '';
                     },
                     'required' => true,

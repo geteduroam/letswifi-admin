@@ -70,6 +70,9 @@ class RealmTrustRepository extends ServiceEntityRepository
         bool $flush = false,
     ): void {
         $realmEntity = $this->getEntityManager()->getRepository(Realm::class)->find($realm);
+        if ($realmEntity === null) {
+            return;
+        }
 
         /** remove first and then insert new trust */
         $entities = $this->findBy(['realm' => $realm]);
@@ -88,7 +91,10 @@ class RealmTrustRepository extends ServiceEntityRepository
             $caEntity = $this->getEntityManager()->getRepository(CA::class)->find($ca);
 
             $entity->setRealm($realmEntity);
-            $entity->setTrustedCaSub($caEntity);
+
+            if ($caEntity !== null) {
+                $entity->setTrustedCaSub($caEntity);
+            }
 
             $this->merge($entity, $flush);
 

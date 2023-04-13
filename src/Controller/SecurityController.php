@@ -29,7 +29,7 @@ class SecurityController extends AbstractController
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        if (!$this->isMainFirewail() || $this->getUser()) {
+        if (!$this->isMainFirewall() || $this->getUser() !== null) {
             return $this->redirectToRoute('overview');
         }
 
@@ -53,14 +53,14 @@ class SecurityController extends AbstractController
             ' it will be intercepted by the logout key on your firewall.');
     }
 
-    private function isMainFirewail(): bool
+    private function isMainFirewall(): bool
     {
+        $firewallName = '';
         $request      = $this->requestStack->getCurrentRequest();
-        $firewallName = $this->security->getFirewallConfig($request)?->getName();
-
-        if ($firewallName !== 'main') {
-            return false;
+        if ($request !== null) {
+            $firewallName = $this->security->getFirewallConfig($request)?->getName();
         }
-        return true;
+
+        return $firewallName === 'main';
     }
 }

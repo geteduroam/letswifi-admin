@@ -13,22 +13,24 @@ namespace App\Entity;
 use App\Repository\RealmNetworkProfileRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+use function sprintf;
+
 #[ORM\Entity(repositoryClass: RealmNetworkProfileRepository::class)]
 class RealmNetworkProfile
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int|null $id = null;
+    private int $id;
 
     #[ORM\ManyToOne(inversedBy: 'realmNetworkProfiles')]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
     private Realm $realm;
 
     #[ORM\ManyToOne(inversedBy: 'realmNetworkProfiles')]
-    private NetworkProfile $networkProfile;
+    private NetworkProfile|null $networkProfile = null;
 
-    public function getId(): int|null
+    public function getId(): int
     {
         return $this->id;
     }
@@ -45,7 +47,7 @@ class RealmNetworkProfile
         return $this;
     }
 
-    public function getNetworkProfile(): NetworkProfile
+    public function getNetworkProfile(): NetworkProfile|null
     {
         return $this->networkProfile;
     }
@@ -59,6 +61,6 @@ class RealmNetworkProfile
 
     public function __toString(): string
     {
-        return $this->getId();
+        return sprintf('%s', $this->getId());
     }
 }

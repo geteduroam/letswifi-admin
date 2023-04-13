@@ -20,21 +20,21 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        saml_based:
-            custom_authenticators:
-                - Surfnet\SamlBundle\Security\Authentication\SamlAuthenticator
+#        saml_based:
+#            custom_authenticators:
+#                - Surfnet\SamlBundle\Security\Authentication\SamlAuthenticator
 #        Use main for local development purposes
-#        main:
-#            lazy: true
-#            provider: users
-#
-#            form_login:
+        main:
+            lazy: true
+            provider: users
+
+            form_login:
 #                 "app_login" is the name of the route created previously
-#                login_path: app_login
-#                check_path: app_login
-#                enable_csrf: true
-#            logout:
-#                path: app_logout
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+            logout:
+                path: app_logout
                 # where to redirect after logout
                 # target: app_any_route
             # activate different ways to authenticate

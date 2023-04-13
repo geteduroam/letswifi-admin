@@ -10,13 +10,13 @@ declare(strict_types=1);
 
 namespace App\Security\Voter;
 
-use App\Entity\Realm;
-use App\Entity\RealmSigningLog;
+use App\Entity\Contact;
 use App\Entity\RealmSigningUser;
 use App\Security\SamlBundle\Identity;
 use LogicException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use function assert;
 use function in_array;
@@ -36,16 +36,16 @@ class RealmSigningUserVoter extends Voter
     {
         $user = $token->getUser();
 
-        if (!$user instanceof Identity) {
+        if (!($user instanceof UserInterface)) {
             return false;
         }
 
-        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)) {
             return true;
         }
 
         assert(
-            $subject instanceof RealmSigningUser
+            $subject instanceof RealmSigningUser,
         );
 
         return match ($attribute) {
@@ -54,9 +54,12 @@ class RealmSigningUserVoter extends Voter
         };
     }
 
-    private function canEditRealmSigningUser(RealmSigningUser $realmSigningUser, Identity $user): bool
+    private function canEditRealmSigningUser(RealmSigningUser $realmSigningUser, UserInterface $user): bool
     {
-        return $user->getContact()->getSuperAdmin() ||
-            $user->getContact()->isOwnerOfRealm($realmSigningUser->getRealm());
+        if (!$user instanceof Identity && !$user instanceof Contact) {
+            return false;
+        }
+
+        return $user->getSuperAdmin() || $user->isOwnerOfRealm($realmSigningUser->getRealm());
     }
 }

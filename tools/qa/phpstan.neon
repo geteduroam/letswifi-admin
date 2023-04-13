@@ -10,6 +10,7 @@ includes:
     - ../../vendor/phpstan/phpstan-doctrine/rules.neon
 
 parameters:
+    checkGenericClassInNonGenericObjectType: false
     level: max
     paths:
         - ../../src

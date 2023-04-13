@@ -20,25 +20,25 @@ class RealmSigningUser
 {
     #[ORM\Id]
     #[ORM\Column(length: 255)]
-    private string|null $requester = null;
+    private string $requester;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
     private Realm $realm;
 
     #[ORM\Column]
-    private int|null $accounts = null;
+    private int $accounts;
 
     #[ORM\Column]
-    private int|null $closedAccounts = null;
+    private int $closedAccounts;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private DateTimeInterface|null $firstIssued = null;
+    private DateTimeInterface $firstIssued;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private DateTimeInterface|null $lastValid = null;
+    private DateTimeInterface $lastValid;
 
-    public function getRequester(): string|null
+    public function getRequester(): string
     {
         return $this->requester;
     }
@@ -62,7 +62,7 @@ class RealmSigningUser
         return $this;
     }
 
-    public function getAccounts(): int|null
+    public function getAccounts(): int
     {
         return $this->accounts;
     }
@@ -74,12 +74,12 @@ class RealmSigningUser
         return $this;
     }
 
-    public function getClosedAccounts(): int|null
+    public function getClosedAccounts(): int
     {
         return $this->closedAccounts;
     }
 
-    public function getOpenAccounts(): int|null
+    public function getOpenAccounts(): int
     {
         return $this->getAccounts() - $this->getClosedAccounts();
     }
@@ -91,7 +91,7 @@ class RealmSigningUser
         return $this;
     }
 
-    public function getFirstIssued(): DateTimeInterface|null
+    public function getFirstIssued(): DateTimeInterface
     {
         return $this->firstIssued;
     }

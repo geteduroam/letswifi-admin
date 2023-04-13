@@ -19,16 +19,16 @@ class RealmSigner
     #[ORM\Id]
     #[ORM\OneToOne(inversedBy: 'realmSigner', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
-    private Realm|null $realm = null;
+    private Realm $realm;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'signer_ca_sub', referencedColumnName: 'sub', nullable: false)]
-    private CA|null $signerCaSub = null;
+    private CA $signerCaSub;
 
     #[ORM\Column]
-    private int|null $defaultValidityDays = null;
+    private int $defaultValidityDays;
 
-    public function getRealm(): Realm|null
+    public function getRealm(): Realm
     {
         return $this->realm;
     }
@@ -40,12 +40,12 @@ class RealmSigner
         return $this;
     }
 
-    public function getSignerCaSub(): CA|null
+    public function getSignerCaSub(): CA
     {
         return $this->signerCaSub;
     }
 
-    public function setSignerCaSub(CA|null $signerCaSub): self
+    public function setSignerCaSub(CA $signerCaSub): self
     {
         $this->signerCaSub = $signerCaSub;
 

@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace App\Security\SamlBundle;
 
 use App\Entity\Contact;
+use App\Entity\Realm;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -53,5 +54,15 @@ class Identity implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): int
     {
         return $this->getContact()->getId();
+    }
+
+    public function getSuperAdmin(): bool
+    {
+        return $this->getContact()->getSuperAdmin();
+    }
+
+    public function isOwnerOfRealm(Realm $realm): bool
+    {
+        return $this->getContact()->isOwnerOfRealm($realm);
     }
 }

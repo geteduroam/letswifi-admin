@@ -16,19 +16,21 @@ use App\Entity\Realm;
 use App\Entity\RealmNetworkProfile;
 use App\Entity\RealmTrust;
 
+use function count;
+
 class SaveRealmCommand
 {
     private string $realm;
 
     private int $signerDays;
 
-    /** @var array<string>  */
+    /** @var array<RealmNetworkProfile>  */
     private array $realmNetworkProfiles;
 
-    /** @var array<string>  */
+    /** @var array<int, NetworkProfile>  */
     private array $networkProfiles = [];
 
-    /** @var array<string>  */
+    /** @var array<int, NetworkProfile>  */
     private array $selectedNetworkProfiles;
 
     private CA $ca;
@@ -51,13 +53,18 @@ class SaveRealmCommand
         $this->setRealm($realm->getRealm())
         ->setRealmNetworkProfiles($realm->getRealmNetworkProfiles()->toArray())
         ->setNetworkProfilesByRealmNetworkProfiles($realm->getRealmNetworkProfiles()->toArray())
-        ->setSignerDays($realm->getRealmSigner()?->getDefaultValidityDays())
-        ->setCa($realm->getRealmSigner()?->getSignerCaSub())
         ->setTrusts($realm->getRealmTrusts()->toArray())
         ->setRefreshKey(false);
+
+        if ($realm->getRealmSigner() === null) {
+            return;
+        }
+
+        $this->setSignerDays($realm->getRealmSigner()->getDefaultValidityDays());
+        $this->setCa($realm->getRealmSigner()->getSignerCaSub());
     }
 
-    public function getRealm(): string|null
+    public function getRealm(): string
     {
         return $this->realm;
     }
@@ -81,7 +88,7 @@ class SaveRealmCommand
         return $this;
     }
 
-    /** @return array<string> */
+    /** @return array<int, NetworkProfile> */
     public function getNetworkProfiles(): array
     {
         return $this->networkProfiles;
@@ -97,7 +104,7 @@ class SaveRealmCommand
         return $this;
     }
 
-    /** @return array<NetworkProfile> */
+    /** @return array<int, NetworkProfile> */
     public function getSelectedNetworkProfiles(): array
     {
         return $this->selectedNetworkProfiles;
@@ -119,6 +126,10 @@ class SaveRealmCommand
     {
         unset($this->selectedNetworkProfiles);
         foreach ($realmNetworkProfiles as $realmNetworkProfile) {
+            if ($realmNetworkProfile->getNetworkProfile() === null) {
+                continue;
+            }
+
             $this->selectedNetworkProfiles[$realmNetworkProfile->getNetworkProfile()->getId()] =
                 $realmNetworkProfile->getNetworkProfile();
         }
@@ -183,7 +194,7 @@ class SaveRealmCommand
     /** @return array<string> */
     public function getTrustedCAs(): array
     {
-        if (empty($this->trustedCas)) {
+        if (count($this->trustedCas) === 0) {
             foreach ($this->trusts as $trust) {
                 $this->trustedCas[$trust->getTrustedCaSub()->getSub()] = $trust->getTrustedCaSub()->getSub();
             }
@@ -200,12 +211,12 @@ class SaveRealmCommand
         return $this;
     }
 
-    public function getKey(): string|null
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    public function setKey(string|null $key): self
+    public function setKey(string $key): self
     {
         $this->key = $key;
 

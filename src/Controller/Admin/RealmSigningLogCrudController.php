@@ -13,8 +13,9 @@ namespace App\Controller\Admin;
 use App\Controller\Admin\Helper\IndexQueryBuilderHelper;
 use App\Controller\Admin\Helper\RealmHelper;
 use App\Controller\Admin\Helper\RealmSigningLogHelper;
-use App\Entity\Realm;
+use App\Entity\Contact;
 use App\Entity\RealmSigningLog;
+use App\Security\SamlBundle\Identity;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
@@ -139,11 +140,18 @@ class RealmSigningLogCrudController extends AbstractCrudController
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        return $this->indexQueryBuilderHelper->buildRealmQuery(
-            $queryBuilder,
-            $this->getUser()->getRoles(),
-            $this->getUser()->getId(),
-        );
+        if (
+            $this->getUser() !== null &&
+            ($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
+        ) {
+            return $this->indexQueryBuilderHelper->buildRealmQuery(
+                $queryBuilder,
+                $this->getUser()->getRoles(),
+                $this->getUser()->getId(),
+            );
+        }
+
+        return $queryBuilder;
     }
 
     /**
@@ -156,7 +164,11 @@ class RealmSigningLogCrudController extends AbstractCrudController
 
         $this->realmSigningLogHelper->revoke($entity);
 
-        return $this->redirect($context->getReferrer());
+        if ($context->getReferrer() !== null) {
+            return $this->redirect($context->getReferrer());
+        }
+
+        return $this->redirectToRoute('overview');
     }
 
     /**
@@ -169,13 +181,20 @@ class RealmSigningLogCrudController extends AbstractCrudController
         return $this->redirect($batchActionDto->getReferrerUrl());
     }
 
-    /** @return array<Realm> */
+    /** @return array<string> */
     private function getRealmsChoicesOfUser(): array
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             return $this->realmHelper->getAllRealms();
         }
 
-        return $this->realmHelper->getUserRealms($this->getUser());
+        if (
+            $this->getUser() !== null &&
+            ($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
+        ) {
+            return $this->realmHelper->getUserRealms($this->getUser());
+        }
+
+        return [];
     }
 }

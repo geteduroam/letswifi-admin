@@ -18,6 +18,7 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 use function in_array;
+use function is_int;
 
 /**
  * @extends ServiceEntityRepository<Realm>
@@ -74,18 +75,23 @@ class RealmRepository extends ServiceEntityRepository
      */
     public function countRealmsForRole(array $roles, int $id): int
     {
-        if (in_array('ROLE_SUPER_ADMIN', $roles)) {
+        if (in_array('ROLE_SUPER_ADMIN', $roles, true)) {
             return $this->count([]);
         }
 
         $queryBuilder = $this->createQueryBuilder('r');
 
-        return $queryBuilder
+        $result = $queryBuilder
             ->select($queryBuilder->expr()->count('r'))
             ->innerJoin(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
             ->andWhere('rc.contact = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->getSingleScalarResult();
+        if (is_int($result)) {
+            return $result;
+        }
+
+        return 0;
     }
 }

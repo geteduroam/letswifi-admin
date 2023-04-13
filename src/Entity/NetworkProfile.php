@@ -21,16 +21,16 @@ class NetworkProfile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int|null $id = null;
+    private int $id;
 
     #[ORM\Column(length: 20)]
-    private string|null $typeName = null;
+    private string $typeName;
 
     #[ORM\Column(length: 255)]
-    private string|null $name = null;
+    private string $name;
 
     #[ORM\Column(length: 255)]
-    private string|null $value = null;
+    private string $value;
 
     /** @var Collection<RealmNetworkProfile>  */
     #[ORM\OneToMany(mappedBy: 'NetworkProfile', targetEntity: RealmNetworkProfile::class)]
@@ -41,12 +41,12 @@ class NetworkProfile
         $this->realmNetworkProfiles = new ArrayCollection();
     }
 
-    public function getId(): int|null
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getTypeName(): string|null
+    public function getTypeName(): string
     {
         return $this->typeName;
     }
@@ -58,7 +58,7 @@ class NetworkProfile
         return $this;
     }
 
-    public function getName(): string|null
+    public function getName(): string
     {
         return $this->name;
     }
@@ -70,7 +70,7 @@ class NetworkProfile
         return $this;
     }
 
-    public function getValue(): string|null
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -100,12 +100,7 @@ class NetworkProfile
 
     public function removeRealmNetworkProfile(RealmNetworkProfile $realmNetworkProfile): self
     {
-        if ($this->realmNetworkProfiles->removeElement($realmNetworkProfile)) {
-            // set the owning side to null (unless already changed)
-            if ($realmNetworkProfile->getNetworkProfile() === $this) {
-                $realmNetworkProfile->setNetworkProfile(null);
-            }
-        }
+        $this->realmNetworkProfiles->removeElement($realmNetworkProfile);
 
         return $this;
     }

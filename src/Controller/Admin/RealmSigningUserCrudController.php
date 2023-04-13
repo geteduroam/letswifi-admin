@@ -13,8 +13,9 @@ namespace App\Controller\Admin;
 use App\Controller\Admin\Helper\IndexQueryBuilderHelper;
 use App\Controller\Admin\Helper\RealmHelper;
 use App\Controller\Admin\Helper\RealmSigningUserHelper;
-use App\Entity\Realm;
+use App\Entity\Contact;
 use App\Entity\RealmSigningUser;
+use App\Security\SamlBundle\Identity;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
@@ -36,13 +37,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\NumericFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class RealmSigningUserCrudController extends AbstractCrudController
 {
     public function __construct(
-        private readonly TokenStorageInterface $tokenStorage,
         private readonly RealmHelper $realmHelper,
         private readonly RealmSigningUserHelper $realmSigningUserHelper,
         protected readonly IndexQueryBuilderHelper $indexQueryBuilderHelper,
@@ -134,9 +134,18 @@ class RealmSigningUserCrudController extends AbstractCrudController
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        return $this->indexQueryBuilderHelper->buildRealmQuery($queryBuilder,
-            $this->getUser()->getRoles(),
-            $this->getUser()->getId());
+        if (
+            $this->getUser() !== null &&
+            ($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
+        ) {
+            return $this->indexQueryBuilderHelper->buildRealmQuery(
+                $queryBuilder,
+                $this->getUser()->getRoles(),
+                $this->getUser()->getId(),
+            );
+        }
+
+        return $queryBuilder;
     }
 
     /**
@@ -149,16 +158,24 @@ class RealmSigningUserCrudController extends AbstractCrudController
 
         $this->realmSigningUserHelper->revoke($entity);
 
-        return $this->redirect($context->getReferrer());
+        if ($context->getReferrer() !== null) {
+            return $this->redirect($context->getReferrer());
+        }
+
+        return $this->redirectToRoute('overview');
     }
 
-    /** @return array<Realm> */
+    /** @return array<string> */
     public function getRealmsChoicesOfUser(): array
     {
         if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             return $this->realmHelper->getAllRealms();
         }
 
-        return $this->realmHelper->getUserRealms($this->tokenStorage->getToken()->getUser());
+        if ($this->getUser() !== null) {
+            return $this->realmHelper->getUserRealms($this->getUser());
+        }
+
+        return [];
     }
 }

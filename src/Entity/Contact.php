@@ -28,7 +28,7 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
     private string $displayName;
 
     #[ORM\Column(length: 255)]
-    private string $emailAddress;
+    private string $userId;
 
     #[ORM\Column(length: 255)]
     private string $password;
@@ -50,7 +50,7 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __toString(): string
     {
-        return $this->getEmailAddress();
+        return $this->getUserId();
     }
 
     public function getId(): int
@@ -82,14 +82,14 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEmailAddress(): string
+    public function getUserId(): string
     {
-        return $this->emailAddress;
+        return $this->userId;
     }
 
-    public function setEmailAddress(string $emailAddress): self
+    public function setUserId(string $userId): self
     {
-        $this->emailAddress = $emailAddress;
+        $this->userId = $userId;
 
         return $this;
     }
@@ -128,7 +128,7 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserIdentifier(): string
     {
-        return $this->getEmailAddress();
+        return $this->getUserId();
     }
 
     public function setPassword(string $password): self

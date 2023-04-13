@@ -58,8 +58,8 @@ class ContactCrudController extends AbstractCrudController
                 ->setLabel('Name'),
             TextField::new('displayName')
                 ->setLabel('Display name'),
-            TextField::new('emailAddress')
-             ->setLabel('Email'),
+            TextField::new('userId')
+             ->setLabel('user ID'),
             BooleanField::new('SuperAdmin')
                 ->setLabel('Super admin'),
             TextField::new('password')

@@ -31,7 +31,7 @@ class RealmSigningLogHelper
     {
         $lastId = end($ids);
         foreach ($ids as $id) {
-            $this->realmSigningLogRepository->revokeById($id, $lastId === $id);
+            $this->realmSigningLogRepository->revokeById((int) $id, $lastId === $id);
         }
     }
 }

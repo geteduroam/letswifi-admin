@@ -30,3 +30,10 @@ services:
 
     # Firewall
     surfnet_saml.saml_provider: '@App\Security\SamlBundle\Authentication\SamlProvider'
+
+    App\Controller\SecurityController:
+        arguments:
+            - '@Symfony\Bundle\SecurityBundle\Security'
+            - '@Symfony\Component\HttpFoundation\RequestStack'
+            - '%env(APP_FAVICON)%'
+            - '%env(APP_NAME)%'

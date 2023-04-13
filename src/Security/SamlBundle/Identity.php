@@ -43,7 +43,7 @@ class Identity implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUsername(): string
     {
-        return $this->contact->getNameId();
+        return $this->contact->getUserId();
     }
 
     public function getUserIdentifier(): string

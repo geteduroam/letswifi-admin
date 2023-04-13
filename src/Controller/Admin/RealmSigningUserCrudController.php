@@ -121,7 +121,7 @@ class RealmSigningUserCrudController extends AbstractCrudController
 
     public function configureAssets(Assets $assets): Assets
     {
-        $assets->addJsFile('/assets/js/confirm-modal.js');
+        $assets->addWebpackEncoreEntry('app');
 
         return parent::configureAssets($assets);
     }

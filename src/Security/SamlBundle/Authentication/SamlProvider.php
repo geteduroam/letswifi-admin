@@ -50,12 +50,12 @@ class SamlProvider implements SamlProviderInterface, UserProviderInterface
         $translatedAssertion = $this->attributeDictionary->translate($assertion);
 
         try {
-            $email = $this->getSingleStringValue('mail', $translatedAssertion);
+            $userId = $this->getSingleStringValue('eduPersonPrincipalName', $translatedAssertion);
         } catch (MissingSamlAttribute $e) {
             throw new BadCredentialsException($e->getMessage());
         }
 
-        $contact = $this->contacts->findByEmail($email);
+        $contact = $this->contacts->findByUserId($userId);
 
         if ($contact === null) {
             throw new BadCredentialsException('You have no access');

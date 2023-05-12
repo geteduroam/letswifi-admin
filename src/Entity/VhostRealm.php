@@ -20,30 +20,30 @@ class VhostRealm
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int|null $id = null;
+    private int $id;
 
     #[ORM\Column(length: 255)]
-    private string|null $httpHost = null;
+    private string $httpHost;
 
     #[ORM\Column(length: 255)]
-    private string|null $pathPrefix = null;
+    private string $pathPrefix;
 
     #[ORM\Column(length: 80)]
-    private string|null $authService = null;
+    private string $authService;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private string|null $authConfig = null;
 
     #[ORM\ManyToOne(inversedBy: 'vhostRealms')]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
-    private Realm|null $realm = null;
+    private Realm $realm;
 
-    public function getId(): int|null
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getHttpHost(): string|null
+    public function getHttpHost(): string
     {
         return $this->httpHost;
     }
@@ -55,7 +55,7 @@ class VhostRealm
         return $this;
     }
 
-    public function getPathPrefix(): string|null
+    public function getPathPrefix(): string
     {
         return $this->pathPrefix;
     }
@@ -67,7 +67,7 @@ class VhostRealm
         return $this;
     }
 
-    public function getAuthService(): string|null
+    public function getAuthService(): string
     {
         return $this->authService;
     }
@@ -91,12 +91,12 @@ class VhostRealm
         return $this;
     }
 
-    public function getRealm(): Realm|null
+    public function getRealm(): Realm
     {
         return $this->realm;
     }
 
-    public function setRealm(Realm|null $realm): self
+    public function setRealm(Realm $realm): self
     {
         $this->realm = $realm;
 

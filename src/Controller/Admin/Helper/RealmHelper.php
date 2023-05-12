@@ -10,8 +10,10 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin\Helper;
 
+use App\Entity\Contact;
 use App\Entity\Realm;
 use App\Repository\RealmRepository;
+use App\Security\SamlBundle\Identity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use function count;
@@ -32,7 +34,7 @@ class RealmHelper
         $choices = [];
 
         foreach ($realms as $realm) {
-            $choices[$realm->getRealm()] = $realm;
+            $choices[$realm->getRealm()] = $realm->getRealm();
         }
 
         return $choices;
@@ -41,7 +43,11 @@ class RealmHelper
     /** @return array<string> */
     public function getUserRealms(UserInterface $user): array
     {
-        $realms = $this->realmRepository->findByUser($user->getContact()->getId());
+        if (!($user instanceof Contact || $user instanceof Identity)) {
+            return [];
+        }
+
+        $realms = $this->realmRepository->findByUser($user->getId());
 
         $realmStrings = $this->getRealmsAsStrings($realms);
 

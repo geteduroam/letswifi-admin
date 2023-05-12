@@ -21,10 +21,10 @@ class CA
 {
     #[ORM\Id]
     #[ORM\Column(length: 255)]
-    private string|null $sub = null;
+    private string $sub;
 
     #[ORM\Column(type: Types::TEXT)]
-    private string|null $pub = null;
+    private string $pub;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private string|null $key = null;
@@ -42,7 +42,7 @@ class CA
         $this->cAs = new ArrayCollection();
     }
 
-    public function getSub(): string|null
+    public function getSub(): string
     {
         return $this->sub;
     }
@@ -54,7 +54,7 @@ class CA
         return $this;
     }
 
-    public function getPub(): string|null
+    public function getPub(): string
     {
         return $this->pub;
     }

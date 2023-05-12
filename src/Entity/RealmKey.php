@@ -24,7 +24,7 @@ class RealmKey
     #[ORM\Id]
     #[ORM\OneToOne(inversedBy: 'realmKey', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
-    private Realm|null $realm = null;
+    private Realm $realm;
 
     /** @var resource */
     #[ORM\Column(name: '`key`', type: Types::BLOB)]
@@ -34,9 +34,9 @@ class RealmKey
     private int $issued;
 
     #[ORM\Column]
-    private int|null $expires = null;
+    private int $expires;
 
-    public function getRealm(): Realm|null
+    public function getRealm(): Realm
     {
         return $this->realm;
     }
@@ -48,9 +48,14 @@ class RealmKey
         return $this;
     }
 
-    public function getKey(): string
+    public function getKey(): string|null
     {
-        return stream_get_contents($this->key);
+        $result = stream_get_contents($this->key);
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
     }
 
     public function setKey(string $key): self

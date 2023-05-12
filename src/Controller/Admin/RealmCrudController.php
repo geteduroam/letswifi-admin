@@ -11,7 +11,9 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\Admin\Helper\IndexQueryBuilderHelper;
+use App\Entity\Contact;
 use App\Entity\Realm;
+use App\Security\SamlBundle\Identity;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
@@ -79,11 +81,18 @@ class RealmCrudController extends AbstractCrudController
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        return $this->indexQueryBuilderHelper->buildRealmQuery(
-            $queryBuilder,
-            $this->getUser()->getRoles(),
-            $this->getUser()->getId(),
-        );
+        if (
+            $this->getUser() !== null &&
+            ($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
+        ) {
+            return $this->indexQueryBuilderHelper->buildRealmQuery(
+                $queryBuilder,
+                $this->getUser()->getRoles(),
+                $this->getUser()->getId(),
+            );
+        }
+
+        return $queryBuilder;
     }
 
     /**

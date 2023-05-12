@@ -19,7 +19,7 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int|null $id = null;
+    private int $id;
 
     #[ORM\Column(length: 150)]
     private string $nameId;
@@ -53,7 +53,7 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getUserId();
     }
 
-    public function getId(): int|null
+    public function getId(): int
     {
         return $this->id;
     }
@@ -138,7 +138,7 @@ class Contact implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPassword(): string|null
+    public function getPassword(): string
     {
         return $this->password;
     }

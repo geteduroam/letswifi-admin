@@ -19,19 +19,19 @@ class RealmTrust
     #[ORM\Id]
     #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'realmTrusts')]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
-    private Realm|null $realm;
+    private Realm $realm;
 
     #[ORM\Id]
     #[ORM\ManyToOne(cascade: ['persist'], fetch: 'EAGER')]
     #[ORM\JoinColumn(name: 'trusted_ca_sub', referencedColumnName: 'sub', nullable: false)]
     private CA $trustedCaSub;
 
-    public function getRealm(): Realm|null
+    public function getRealm(): Realm
     {
         return $this->realm;
     }
 
-    public function setRealm(Realm|null $realm): self
+    public function setRealm(Realm $realm): self
     {
         $this->realm = $realm;
 

@@ -70,6 +70,9 @@ class RealmNetworkProfileRepository extends ServiceEntityRepository
         bool $flush = false,
     ): void {
         $realmEntity = $this->getEntityManager()->getRepository(Realm::class)->find($realm);
+        if ($realmEntity === null) {
+            return;
+        }
 
         /** remove first and then insert new RealmNetworkProfile */
         $entities = $this->findBy(['realm' => $realm]);
@@ -89,7 +92,9 @@ class RealmNetworkProfileRepository extends ServiceEntityRepository
                 ->getRepository(NetworkProfile::class)->find($networkProfile);
 
             $entity->setRealm($realmEntity);
-            $entity->setNetworkProfile($networkProfileEntity);
+            if ($networkProfileEntity !== null) {
+                $entity->setNetworkProfile($networkProfileEntity);
+            }
 
             $this->merge($entity, $flush);
 

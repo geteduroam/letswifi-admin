@@ -20,7 +20,7 @@ class Realm
 {
     #[ORM\Id]
     #[ORM\Column(length: 127)]
-    private string|null $realm = null;
+    private string $realm;
 
     /** @var Collection<RealmContact> */
     #[ORM\OneToMany(mappedBy: 'realm', targetEntity: RealmContact::class)]
@@ -40,7 +40,7 @@ class Realm
 
     #[ORM\OneToOne(mappedBy: 'realm', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
-    private RealmKey|null $realmKey = null;
+    private RealmKey $realmKey;
 
     /** @var Collection<RealmNetworkProfile>  */
     #[ORM\OneToMany(mappedBy: 'realm', targetEntity: RealmNetworkProfile::class)]
@@ -69,7 +69,7 @@ class Realm
         return $this->getRealm();
     }
 
-    public function getRealm(): string|null
+    public function getRealm(): string
     {
         return $this->realm;
     }
@@ -122,12 +122,7 @@ class Realm
 
     public function removeRealmTrust(RealmTrust $realmTrust): self
     {
-        if ($this->realmTrusts->removeElement($realmTrust)) {
-            // set the owning side to null (unless already changed)
-            if ($realmTrust->getRealm() === $this) {
-                $realmTrust->setRealm(null);
-            }
-        }
+        $this->realmTrusts->removeElement($realmTrust);
 
         return $this;
     }
@@ -162,28 +157,6 @@ class Realm
         }
 
         $this->realmKey = $realmKey;
-
-        return $this;
-    }
-
-    public function getRealmHelpdesk(): RealmHelpdesk|null
-    {
-        return $this->realmHelpdesk;
-    }
-
-    public function setRealmHelpdesk(RealmHelpdesk|null $realmHelpdesk): self
-    {
-        // unset the owning side of the relation if necessary
-        if ($realmHelpdesk === null && $this->realmHelpdesk !== null) {
-            $this->realmHelpdesk->setRealm(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($realmHelpdesk !== null && $realmHelpdesk->getRealm() !== $this) {
-            $realmHelpdesk->setRealm($this);
-        }
-
-        $this->realmHelpdesk = $realmHelpdesk;
 
         return $this;
     }
@@ -229,12 +202,7 @@ class Realm
 
     public function removeVhostRealm(VhostRealm $vhostRealm): self
     {
-        if ($this->vhostRealms->removeElement($vhostRealm)) {
-            // set the owning side to null (unless already changed)
-            if ($vhostRealm->getRealm() === $this) {
-                $vhostRealm->setRealm(null);
-            }
-        }
+        $this->vhostRealms->removeElement($vhostRealm);
 
         return $this;
     }
@@ -257,12 +225,7 @@ class Realm
 
     public function removeRealmHelpdesk(RealmHelpdesk $realmHelpdesk): self
     {
-        if ($this->realmHelpdesks->removeElement($realmHelpdesk)) {
-            // set the owning side to null (unless already changed)
-            if ($realmHelpdesk->getRealm() === $this) {
-                $realmHelpdesk->setRealm(null);
-            }
-        }
+        $this->realmHelpdesks->removeElement($realmHelpdesk);
 
         return $this;
     }

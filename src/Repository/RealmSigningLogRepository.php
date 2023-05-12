@@ -20,6 +20,7 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 use function in_array;
+use function is_int;
 
 /**
  * @extends ServiceEntityRepository<RealmSigningLog>
@@ -60,7 +61,7 @@ class RealmSigningLogRepository extends ServiceEntityRepository
     public function revoke(RealmSigningLog $entity, bool $flush = false): void
     {
         // Do not revoke again!
-        if ($entity->getRevoked()) {
+        if ($entity->getRevoked() !== null) {
             return;
         }
 
@@ -78,11 +79,15 @@ class RealmSigningLogRepository extends ServiceEntityRepository
     public function revokeById(int $id, bool $flush = false): void
     {
         $entity = $this->find($id);
+        if ($entity === null) {
+            return;
+        }
+
         $this->revoke($entity, $flush);
     }
 
-    /** @return array<RealmSigningLog>|null */
-    public function findByUserId(int $id): array|null
+    /** @return array<RealmSigningLog> */
+    public function findByUserId(int $id): array
     {
         return $this->createQueryBuilder('rs')
             ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
@@ -93,8 +98,8 @@ class RealmSigningLogRepository extends ServiceEntityRepository
             ->getArrayResult();
     }
 
-    /** @return array<RealmSigningLog>|null */
-    public function findByUserIdGroupByRequester(int $id): array|null
+    /** @return array<RealmSigningLog> */
+    public function findByUserIdGroupByRequester(int $id): array
     {
         return $this->createQueryBuilder('rs')
             ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
@@ -114,13 +119,13 @@ class RealmSigningLogRepository extends ServiceEntityRepository
      */
     public function countRealmSigningLogsForRole(array $roles, int $id): int
     {
-        if (in_array('ROLE_SUPER_ADMIN', $roles)) {
+        if (in_array('ROLE_SUPER_ADMIN', $roles, true)) {
             return $this->count([]);
         }
 
         $queryBuilder = $this->createQueryBuilder('rs');
 
-        return $queryBuilder
+        $result =  $queryBuilder
             ->select($queryBuilder->expr()->count('rs'))
             ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
             ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
@@ -128,6 +133,12 @@ class RealmSigningLogRepository extends ServiceEntityRepository
             ->setParameter('id', $id)
             ->getQuery()
             ->getSingleScalarResult();
+
+        if (is_int($result)) {
+            return $result;
+        }
+
+        return 0;
     }
 
     /** @return array<RealmSigningLog>|null */

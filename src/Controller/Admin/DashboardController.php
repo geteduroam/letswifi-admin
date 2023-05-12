@@ -18,6 +18,7 @@ use App\Entity\RealmHelpdesk;
 use App\Entity\RealmSigningLog;
 use App\Entity\RealmSigningUser;
 use App\Entity\VhostRealm;
+use App\Security\SamlBundle\Identity;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -105,8 +106,11 @@ class DashboardController extends AbstractDashboardController
 
     public function configureUserMenu(UserInterface $user): UserMenu
     {
+        $firewallName = '';
         $request      = $this->requestStack->getCurrentRequest();
-        $firewallName = $this->security->getFirewallConfig($request)?->getName();
+        if ($request !== null) {
+            $firewallName = $this->security->getFirewallConfig($request)?->getName();
+        }
 
         if ($firewallName === 'main') {
             return parent::configureUserMenu($user);
@@ -123,6 +127,13 @@ class DashboardController extends AbstractDashboardController
     /** @throws Exception */
     private function getRealms(): int
     {
+        if (
+            $this->getUser() === null ||
+            !($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
+        ) {
+            return 0;
+        }
+
         return $this->doctrine->getRepository(
             Realm::class,
         )->countRealmsForRole($this->getUser()->getRoles(), $this->getUser()->getId());
@@ -130,6 +141,13 @@ class DashboardController extends AbstractDashboardController
 
     private function countUsers(): int
     {
+        if (
+            $this->getUser() === null ||
+            !($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
+        ) {
+            return 0;
+        }
+
         return $this->doctrine->getRepository(
             RealmSigningLog::class,
         )->countRealmSigningLogsForRole($this->getUser()->getRoles(), $this->getUser()->getId());
@@ -137,6 +155,13 @@ class DashboardController extends AbstractDashboardController
 
     private function getPseudoAccounts(): int
     {
+        if (
+            $this->getUser() === null ||
+            !($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
+        ) {
+            return 0;
+        }
+
         return count($this->doctrine->getRepository(
             RealmSigningLog::class,
         )->findByUserIdGroupByRequester($this->getUser()->getId()));

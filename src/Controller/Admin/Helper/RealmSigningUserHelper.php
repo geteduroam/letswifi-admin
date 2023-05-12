@@ -27,7 +27,7 @@ class RealmSigningUserHelper
             $realmSigningUser->getRealm()->getRealm(),
         );
 
-        foreach ($realmSigningLogs as $realmSigningLog) {
+        foreach ($realmSigningLogs ?? [] as $realmSigningLog) {
             $this->realmSigningLogRepository->revoke($realmSigningLog, true);
         }
     }

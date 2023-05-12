@@ -29,10 +29,10 @@ class RealmHelpdesk
     private string|null $phone = null;
 
     #[ORM\Column(length: 4)]
-    private string|null $lang = null;
+    private string $lang;
 
     #[ORM\Column(length: 50)]
-    private string|null $name = null;
+    private string $name;
 
     public function getId(): int|null
     {
@@ -87,7 +87,7 @@ class RealmHelpdesk
         return $this;
     }
 
-    public function getLang(): string|null
+    public function getLang(): string
     {
         return $this->lang;
     }
@@ -99,7 +99,7 @@ class RealmHelpdesk
         return $this;
     }
 
-    public function getName(): string|null
+    public function getName(): string
     {
         return $this->name;
     }

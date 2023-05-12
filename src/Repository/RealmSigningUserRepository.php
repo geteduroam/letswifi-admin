@@ -52,8 +52,8 @@ class RealmSigningUserRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    /** @return array<RealmSigningUser>|null */
-    public function findByUserId(int $id): array|null
+    /** @return array<RealmSigningUser> */
+    public function findByUserId(int $id): array
     {
         return $this->createQueryBuilder('rs')
             ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')

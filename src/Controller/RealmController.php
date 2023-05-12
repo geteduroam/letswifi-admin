@@ -15,7 +15,6 @@ use App\Application\CommandHandler\SaveRealmCommandHandler;
 use App\Application\Factory\SaveRealmCommandFactory;
 use App\Form\Entity\RealmType;
 use App\Repository\RealmRepository;
-use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use function array_key_exists;
 use function is_array;
-use function sprintf;
+use function is_string;
 
 class RealmController extends AbstractController
 {
@@ -45,7 +44,7 @@ class RealmController extends AbstractController
 
         $entity = $this->realmRepository->find($entityId);
 
-        if (!$this->isGranted('ROLE_ADMIN')) {
+        if (!$this->isGranted('ROLE_ADMIN') || $entityId === '' || $referrer === '' || $entity === null) {
             return $this->redirect($referrer);
         }
 
@@ -58,7 +57,9 @@ class RealmController extends AbstractController
             if ($form->isValid()) {
                 $command = $form->getData();
                 if ($this->isSaveAction($request)) {
-                    $this->saveRealm($command);
+                    if ($command instanceof SaveRealmCommand) {
+                        $this->saveRealm($command);
+                    }
                 }
 
                 return $this->redirect($referrer);
@@ -75,15 +76,19 @@ class RealmController extends AbstractController
 
     private function getRouteParameter(Request $request, string $parameterName): string
     {
-        $routeParams = $request->query->getIterator('routeParams');
+        $routeParams = $request->query->getIterator();
 
         foreach ($routeParams as $parameter) {
-            if (is_array($parameter) && (array_key_exists($parameterName, $parameter))) {
+            if (!is_array($parameter) || (!array_key_exists($parameterName, $parameter))) {
+                continue;
+            }
+
+            if (is_string($parameter[$parameterName])) {
                 return $parameter[$parameterName];
             }
         }
 
-        throw new InvalidArgumentException(sprintf('Unknown or invalid argument %s', $parameterName));
+        return '';
     }
 
     private function saveRealm(

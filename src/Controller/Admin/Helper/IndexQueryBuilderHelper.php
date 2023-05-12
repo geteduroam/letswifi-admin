@@ -28,7 +28,7 @@ class IndexQueryBuilderHelper
         array $roles,
         int $userId,
     ): QueryBuilder {
-        if (in_array('ROLE_SUPER_ADMIN', $roles)) {
+        if (in_array('ROLE_SUPER_ADMIN', $roles, true)) {
             return $queryBuilder;
         }
 

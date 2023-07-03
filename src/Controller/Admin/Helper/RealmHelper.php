@@ -63,6 +63,11 @@ class RealmHelper
     {
         $realms = $this->realmRepository->findAll();
 
+        if (count($realms) === 0) {
+            $realms['no realms'] = 'no realms';
+            return $realms;
+        }
+
         return $this->getRealmsAsStrings($realms);
     }
 }

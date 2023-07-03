@@ -18,7 +18,6 @@ use App\Entity\RealmHelpdesk;
 use App\Entity\RealmSigningLog;
 use App\Entity\RealmSigningUser;
 use App\Entity\VhostRealm;
-use App\Security\SamlBundle\Identity;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -157,6 +156,4 @@ class DashboardController extends AbstractDashboardController
             RealmSigningLog::class,
         )->findByUserIdGroupByRequester($this->getUser()->getId()));
     }
-
-
 }

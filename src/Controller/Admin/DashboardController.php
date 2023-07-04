@@ -18,7 +18,6 @@ use App\Entity\RealmHelpdesk;
 use App\Entity\RealmSigningLog;
 use App\Entity\RealmSigningUser;
 use App\Entity\VhostRealm;
-use App\Security\SamlBundle\Identity;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -55,9 +54,9 @@ class DashboardController extends AbstractDashboardController
     public function indexDefaultLocale(): Response
     {
         return $this->render('bundles/EasyAdminBundle/dashboard.html.twig', [
-            'realms' => $this->getRealms(),
-            'users' => $this->countUsers(),
-            'pseudoAccounts' => $this->getPseudoAccounts(),
+            'realmCount' => $this->countRealms(),
+            'userCount' => $this->countUsers(),
+            'pseudoAccountCount' => $this->countPseudoAccounts(),
         ]);
     }
 
@@ -125,12 +124,9 @@ class DashboardController extends AbstractDashboardController
     }
 
     /** @throws Exception */
-    private function getRealms(): int
+    private function countRealms(): int
     {
-        if (
-            $this->getUser() === null ||
-            !($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
-        ) {
+        if (! $this->getUser() instanceof UserInterface) {
             return 0;
         }
 
@@ -139,12 +135,9 @@ class DashboardController extends AbstractDashboardController
         )->countRealmsForRole($this->getUser()->getRoles(), $this->getUser()->getId());
     }
 
-    private function countUsers(): int
+    private function countPseudoAccounts(): int
     {
-        if (
-            $this->getUser() === null ||
-            !($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
-        ) {
+        if (! $this->getUser() instanceof UserInterface) {
             return 0;
         }
 
@@ -153,12 +146,9 @@ class DashboardController extends AbstractDashboardController
         )->countRealmSigningLogsForRole($this->getUser()->getRoles(), $this->getUser()->getId());
     }
 
-    private function getPseudoAccounts(): int
+    private function countUsers(): int
     {
-        if (
-            $this->getUser() === null ||
-            !($this->getUser() instanceof Contact || $this->getUser() instanceof Identity)
-        ) {
+        if (! $this->getUser() instanceof UserInterface) {
             return 0;
         }
 

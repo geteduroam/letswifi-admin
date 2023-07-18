@@ -33,7 +33,7 @@ class NetworkProfile
     private string $value;
 
     /** @var Collection<RealmNetworkProfile>  */
-    #[ORM\OneToMany(mappedBy: 'NetworkProfile', targetEntity: RealmNetworkProfile::class)]
+    #[ORM\OneToMany(mappedBy: 'networkProfile', targetEntity: RealmNetworkProfile::class)]
     private Collection $realmNetworkProfiles;
 
     public function __construct()

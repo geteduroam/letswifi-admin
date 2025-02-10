@@ -77,10 +77,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
                     return $entity->getRealm()->getRealm();
                 }),
             DateTimeField::new('expires', 'ValidUntil')
-                ->setFormat('yyyy-MM-dd')
-                ->formatValue(static function ($value, $entity) {
-                    return $value ?? '-';
-                }),
+                ->setFormat('yyyy-MM-dd'),
             BooleanField::new('revoked')
                 ->renderAsSwitch(false)
                 ->formatValue(static function ($value, $entity) {

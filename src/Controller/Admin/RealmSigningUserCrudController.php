@@ -158,8 +158,8 @@ class RealmSigningUserCrudController extends AbstractCrudController
 
         $this->realmSigningUserHelper->revoke($entity);
 
-        if ($context->getReferrer() !== null) {
-            return $this->redirect($context->getReferrer());
+        if ($context->getRequest()->headers->get('referer') !== null) {
+            return $this->redirect($context->getRequest()->headers->get('referer'));
         }
 
         return $this->redirectToRoute('overview');

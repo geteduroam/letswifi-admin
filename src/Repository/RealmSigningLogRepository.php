@@ -99,16 +99,21 @@ class RealmSigningLogRepository extends ServiceEntityRepository
     }
 
     /** @return array<RealmSigningLog> */
-    public function findByUserIdGroupByRequester(int $id): array
+    public function findByUserIdGroupByRequester(int $id): int
     {
-        return $this->createQueryBuilder('rs')
+        $queryBuilder = $this->createQueryBuilder('rs');
+        $queryBuilder = $queryBuilder->select($queryBuilder->expr()->count('DISTINCT(rs.requester)'))
             ->join(Realm::class, 'r', 'WITH', 'rs.realm = r.realm')
             ->join(RealmContact::class, 'rc', 'WITH', 'r.realm = rc.realm')
             ->andWhere('rc.contact = :id')
-            ->setParameter('id', $id)
-            ->groupBy('rs.requester')
-            ->getQuery()
-            ->getArrayResult();
+            ->setParameter('id', $id);
+
+        $result = $queryBuilder->getQuery()->getSingleScalarResult();
+        if (is_int($result)) {
+            return $result;
+        }
+
+        return 0;
     }
 
     /**

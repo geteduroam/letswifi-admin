@@ -152,8 +152,7 @@ class DashboardController extends AbstractDashboardController
             return 0;
         }
 
-        return count($this->doctrine->getRepository(
-            RealmSigningLog::class,
-        )->findByUserIdGroupByRequester($this->getUser()->getId()));
+        return $this->doctrine->getRepository(RealmSigningLog::class)
+            ->findByUserIdGroupByRequester($this->getUser()->getId());
     }
 }

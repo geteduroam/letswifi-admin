@@ -35,11 +35,9 @@ class Realm
     private Collection $realmTrusts;
 
     #[ORM\OneToOne(mappedBy: 'realm', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
     private RealmVhost $realmVhost;
 
     #[ORM\OneToOne(mappedBy: 'realm', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'realm', referencedColumnName: 'realm', nullable: false)]
     private RealmKey $realmKey;
 
     /** @var Collection<RealmNetworkProfile>  */

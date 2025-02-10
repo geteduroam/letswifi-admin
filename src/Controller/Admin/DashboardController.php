@@ -68,7 +68,6 @@ class DashboardController extends AbstractDashboardController
         return Dashboard::new()
             ->setTitle($name)
             ->setFaviconPath($favicon)
-            ->disableDarkMode()
             ->setLocales(['en', 'nl']);
     }
 

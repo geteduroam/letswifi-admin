@@ -60,6 +60,7 @@ class RealmSigningUserCrudController extends AbstractCrudController
             ->setPaginatorUseOutputWalkers(true)
             ->setPaginatorFetchJoinCollection(true)
             ->setEntityPermission('ROLE_ADMIN')
+            ->setDefaultSort(['lastValid' => 'DESC'])
             ->setPageTitle('index', 'User views');
     }
 

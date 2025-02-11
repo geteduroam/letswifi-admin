@@ -59,6 +59,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
     {
         return $crud
             ->setEntityPermission('ROLE_ADMIN')
+            ->setDefaultSort(['expires' => 'DESC'])
             ->setPageTitle('index', 'PseudoAccounts');
     }
 

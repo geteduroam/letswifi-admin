@@ -59,6 +59,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
     {
         return $crud
             ->setEntityPermission('ROLE_ADMIN')
+            ->setDefaultSort(['expires' => 'DESC'])
             ->setPageTitle('index', 'PseudoAccounts');
     }
 
@@ -77,10 +78,7 @@ class RealmSigningLogCrudController extends AbstractCrudController
                     return $entity->getRealm()->getRealm();
                 }),
             DateTimeField::new('expires', 'ValidUntil')
-                ->setFormat('yyyy-MM-dd')
-                ->formatValue(static function ($value, $entity) {
-                    return $value ?? '-';
-                }),
+                ->setFormat('yyyy-MM-dd'),
             BooleanField::new('revoked')
                 ->renderAsSwitch(false)
                 ->formatValue(static function ($value, $entity) {
@@ -164,8 +162,8 @@ class RealmSigningLogCrudController extends AbstractCrudController
 
         $this->realmSigningLogHelper->revoke($entity);
 
-        if ($context->getReferrer() !== null) {
-            return $this->redirect($context->getReferrer());
+        if ($context->getRequest()->headers->get('referer') !== null) {
+            return $this->redirect($context->getRequest()->headers->get('referer'));
         }
 
         return $this->redirectToRoute('overview');

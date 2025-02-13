@@ -1,6 +1,6 @@
 # Let's wifi admin
 
-The Lets's wifi admin panel is a frontend panel where Eduroam administrators can manage signed in users and configure realms. 
+The Lets's wifi admin panel is a frontend panel where eduroam administrators can manage signed in users and configure realms. 
 
 ## Prerequisites
 

@@ -20,9 +20,15 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        saml_based:
-            custom_authenticators:
-                - Surfnet\SamlBundle\Security\Authentication\SamlAuthenticator
+        #saml_based:
+        #    custom_authenticators:
+        #        - Surfnet\SamlBundle\Security\Authentication\SamlAuthenticator
+        main:
+            remote_user:
+                provider: users
+                user: REMOTE_USER
+            logout:
+                path: app_logout
 #        Use main for local development purposes
 #        main:
 #            lazy: true
